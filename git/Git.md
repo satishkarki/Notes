@@ -202,9 +202,16 @@ From August 13, 2021, GitHub is no longer accepting account passwords when authe
   git remote -v
   
   # pushes changes to origin
-  git push -u origin master 
+  git push -u origin main 
+  
   
   ```
+  
+  **NOTE**
+  
+  On Oct. 1, 2020, any new repositories you create will use main as the default branch, instead of master, It is GitHub's effort to remove unnecessary reference to slavery and replace them with more inclusive term.
+  
+  
   
   ### Removing Remote Repository
   
@@ -228,6 +235,15 @@ From August 13, 2021, GitHub is no longer accepting account passwords when authe
   ```
   
   Note: `git remote rm` does not delete the remote repository from the server.  It simply removes the remote and its references from your local repository.
-
-
+  
+  
+  
+  ### See the changes made to your file
+  
+  ```bash
+  # To show the files changes not yet staged
+  git diff 
+  ```
+  
+  
 
