@@ -174,7 +174,29 @@ git config --global --list
   
   ```
   
+  ### Removing Remote Repository
   
+  ```bash
+  
+  # View current remotes
+  git remote -v
+  
+  > origin  https://github.com/OWNER/REPOSITORY.git (fetch)
+  > origin  https://github.com/OWNER/REPOSITORY.git (push)
+  > destination  https://github.com/FORKER/REPOSITORY.git (fetch)
+  > destination  https://github.com/FORKER/REPOSITORY.git (push)
+  
+  # Remove remote
+  git remote rm destination
+  
+  # Verify it's gone
+  git remote -v
+  
+  > origin  https://github.com/OWNER/REPOSITORY.git (fetch)
+  > origin  https://github.com/OWNER/REPOSITORY.git (push)
+  ```
+  
+  Note: `git remote rm` does not delete the remote repository from the server.  It simply removes the remote and its references from your local repository.
 
 
 
