@@ -141,7 +141,16 @@ git config --global --list
   git commit -m "First commit"
   ```
 
+  #### Uncommit Changes you just made to your Git Repo
   
+  ```bash
+  # Remove the most recent commit# Commit again!
+  git reset HEAD~1
+  ```
+  
+  - Reset can be --soft, --mixed, --hard. [Learn More](https://levelup.gitconnected.com/confused-with-the-difference-between-git-reset-soft-mixed-hard-3285e8b5cd0f)
+  
+    ![GitReset](gitreset.png)
 
 
 
