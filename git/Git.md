@@ -151,6 +151,30 @@ git config --global --list
   - Reset can be --soft, --mixed, --hard. [Learn More](https://levelup.gitconnected.com/confused-with-the-difference-between-git-reset-soft-mixed-hard-3285e8b5cd0f)
   
     ![GitReset](gitreset.png)
+  
+    
+  
+  ### Add a remote origin and Push
+  
+  ```bash
+  # sets the new remote
+  git remote add origin remote_repository_URL
+  
+  # Use this if you have enabled SSH
+  git remote add origin git@github.com/satishkarki/Notes.git
+  
+  # USe this if SSH is not enabled
+  git remote add origin https://github.com/satishkarki/Notes.git
+  
+  # List the remote connections you have to other repositories
+  git remote -v
+  
+  # pushes changes to origin
+  git push -u origin master 
+  
+  ```
+  
+  
 
 
 
