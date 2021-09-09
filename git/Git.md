@@ -173,100 +173,127 @@ From August 13, 2021, GitHub is no longer accepting account passwords when authe
   git commit -m "First commit"
   ```
 
-  #### Uncommit Changes you just made to your Git Repo
+  ### Remove file from staging area
+
+  ```bash
+  # to remove all files from the staging area
+  #-r is used for recursive 
+  git rm --cached -r .
+  ```
+
   
+
+  #### Uncommit Changes you just made to your Git Repo
+
   ```bash
   # Remove the most recent commit# Commit again!
   git reset HEAD~1
   ```
-  
+
   - Reset can be --soft, --mixed, --hard. [Learn More](https://levelup.gitconnected.com/confused-with-the-difference-between-git-reset-soft-mixed-hard-3285e8b5cd0f)
+
+  ![GitReset](gitreset.png)
+
   
-    ![GitReset](gitreset.png)
-  
-    
-  
-  ### Add a remote origin and Push
-  
-  ```bash
-  # sets the new remote
-  git remote add origin remote_repository_URL
-  
-  # Use this if you have enabled SSH
-  git remote add origin git@github.com/satishkarki/Notes.git
-  
-  # Use this if SSH is not enabled
-  git remote add origin https://github.com/satishkarki/Notes.git
-  
-  # List the remote connections you have to other repositories
-  git remote -v
-  
-  # pushes changes to origin
-  git push -u origin main 
-  
-  
-  ```
-  
-  **NOTE**
-  
-  On Oct. 1, 2020, any new repositories you create will use main as the default branch, instead of master, It is GitHub's effort to remove unnecessary reference to slavery and replace them with more inclusive term.
-  
-  
-  
-  ### Removing Remote Repository
-  
-  ```bash
-  # View current remotes
-  git remote -v
-  
-  > origin  https://github.com/OWNER/REPOSITORY.git (fetch)
-  > origin  https://github.com/OWNER/REPOSITORY.git (push)
-  > destination  https://github.com/FORKER/REPOSITORY.git (fetch)
-  > destination  https://github.com/FORKER/REPOSITORY.git (push)
-  
-  # Remove remote
-  git remote rm destination
-  
-  # Verify it's gone
-  git remote -v
-  
-  > origin  https://github.com/OWNER/REPOSITORY.git (fetch)
-  > origin  https://github.com/OWNER/REPOSITORY.git (push)
-  ```
-  
-  Note: `git remote rm` does not delete the remote repository from the server.  It simply removes the remote and its references from your local repository.
-  
-  
-  
-  ### See the changes made to your file
-  
-  ```bash
-  # To show the files changes not yet staged
-  git diff 
-  ```
-  
-  ### View Commit History
-  
-  ```bash
-  git log
-  git log --oneline --graph
-  ```
-  
-  ### Basic Git Flow
-  
-  ```bash
-  git add .
-  
-  git status # Lists all new or modified files to be committed
-  
-  git commit -m "Second commit"
-  
-  git push -u origin main
-  ```
+
+### Add a remote origin and Push
+
+```bash
+# sets the new remote
+git remote add origin remote_repository_URL
+
+# Use this if you have enabled SSH
+git remote add origin git@github.com/satishkarki/Notes.git
+
+# Use this if SSH is not enabled
+git remote add origin https://github.com/satishkarki/Notes.git
+
+# List the remote connections you have to other repositories
+git remote -v
+
+# pushes changes to origin
+git push -u origin main 
+
+
+```
+
+**NOTE**
+
+On Oct. 1, 2020, any new repositories you create will use main as the default branch, instead of master, It is GitHub's effort to remove unnecessary reference to slavery and replace them with more inclusive term.
+
+
+
+### Removing Remote Repository
+
+```bash
+# View current remotes
+git remote -v
+
+> origin  https://github.com/OWNER/REPOSITORY.git (fetch)
+> origin  https://github.com/OWNER/REPOSITORY.git (push)
+> destination  https://github.com/FORKER/REPOSITORY.git (fetch)
+> destination  https://github.com/FORKER/REPOSITORY.git (push)
+
+# Remove remote
+git remote rm destination
+
+# Verify it's gone
+git remote -v
+
+> origin  https://github.com/OWNER/REPOSITORY.git (fetch)
+> origin  https://github.com/OWNER/REPOSITORY.git (push)
+```
+
+Note: `git remote rm` does not delete the remote repository from the server.  It simply removes the remote and its references from your local repository.
+
+
+
+### See the changes made to your file
+
+```bash
+# To show the files changes not yet staged
+git diff 
+```
+
+### View Commit History
+
+```bash
+git log
+git log --oneline --graph
+```
+
+## Basic Git Flow
+
+```bash
+git add .
+
+git status # Lists all new or modified files to be committed
+
+git commit -m "Second commit"
+
+git push -u origin main
+```
 
 ## Cloning a Git Repo
 
 ```bash
 git clone remote_repository_URl
+```
+
+## Git Ignore
+
+When we push our source code in the remote repository then we can use git ignore to exclude sensitive files likes API keys, passwords and even the local setting files, which is just local to our settings. One example of unwanted file is DS_Store file. 
+
+```bash
+# Create a .gitignore file
+touch .gitignore
+
+# Add file to be ignored in .gitignore file
+vim .gitignore
+
+#Then list the files you want to ignore as a list, Example
+.DS_Store
+API/api.html
+
 ```
 
