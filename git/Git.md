@@ -195,7 +195,7 @@ From August 13, 2021, GitHub is no longer accepting account passwords when authe
   # Use this if you have enabled SSH
   git remote add origin git@github.com/satishkarki/Notes.git
   
-  # USe this if SSH is not enabled
+  # Use this if SSH is not enabled
   git remote add origin https://github.com/satishkarki/Notes.git
   
   # List the remote connections you have to other repositories
@@ -245,7 +245,28 @@ From August 13, 2021, GitHub is no longer accepting account passwords when authe
   git diff 
   ```
   
-  this is a vague paragraph
+  ### View Commit History
   
+  ```bash
+  git log
+  git log --oneline --graph
+  ```
   
+  ### Basic Git Flow
+  
+  ```bash
+  git add .
+  
+  git status # Lists all new or modified files to be committed
+  
+  git commit -m "Second commit"
+  
+  git push -u origin main
+  ```
+
+## Cloning a Git Repo
+
+```bash
+git clone remote_repository_URl
+```
 
