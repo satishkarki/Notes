@@ -87,6 +87,8 @@ From August 13, 2021, GitHub is no longer accepting account passwords when authe
   # If needed, anytime you can delete the cache record by:
   $ git config --global --unset credential.helper
   $ git config --system --unset credential.helper
+  
+  #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
   ```
 
   For other OS follow this [article](https://stackoverflow.com/questions/68775869/support-for-password-authentication-was-removed-please-use-a-personal-access-to)
@@ -136,65 +138,60 @@ From August 13, 2021, GitHub is no longer accepting account passwords when authe
 ## Let's Git
 
 - Create a Repository
-
 - Go to your working directory
 
-  ### Initialize Git
+### Initialize Git
 
-  ```bash
-   # To create a README file for the repository
-   touch README.md
-   
-   # Initiates an empty git repository
-   git init          
-  ```
+```bash
+ # To create a README file for the repository
+ touch README.md
+ 
+ # Initiates an empty git repository
+ git init          
+```
 
-  ### Add files to the Staging Area for commit
+### Add files to the Staging Area for commit
 
-  ```bash
-  # Adds all the files in the local repository and stages them for commit
-  git add . 
-  
-  # To add a specific file
-  git add README.md 
-  ```
+```bash
+# Adds all the files in the local repository and stages them for commit
+git add . 
 
-  ### Git Status
+# To add a specific file
+git add README.md 
+```
 
-  ```bash
-  # Lists all new or modified files to be committed
-  git status
-  ```
+### Git Status
 
-  ### Commit Changes to Local Repo
+```bash
+# Lists all new or modified files to be committed
+git status
+```
 
-  ```bash
-  # The message in the " " is given so that the other users can read the message and see what changes you made
-  git commit -m "First commit"
-  ```
+### Commit Changes to Local Repo
 
-  ### Remove file from staging area
+```bash
+# The message in the " " is given so that the other users can read the message and see what changes you made
+git commit -m "First commit"
+```
 
-  ```bash
-  # to remove all files from the staging area
-  #-r is used for recursive 
-  git rm --cached -r .
-  ```
+### Remove file from staging area
 
-  
+```bash
+# to remove all files from the staging area
+#-r is used for recursive 
+git rm --cached -r .
+```
 
-  #### Uncommit Changes you just made to your Git Repo
+### Uncommit Changes you just made to your Git Repo
 
-  ```bash
-  # Remove the most recent commit# Commit again!
-  git reset HEAD~1
-  ```
+```bash
+# Remove the most recent commit# Commit again!
+git reset HEAD~1
+```
 
-  - Reset can be --soft, --mixed, --hard. [Learn More](https://levelup.gitconnected.com/confused-with-the-difference-between-git-reset-soft-mixed-hard-3285e8b5cd0f)
+- Reset can be --soft, --mixed, --hard. [Learn More](https://levelup.gitconnected.com/confused-with-the-difference-between-git-reset-soft-mixed-hard-3285e8b5cd0f)
 
-  ![GitReset](gitreset.png)
-
-  
+![GitReset](gitreset.png)
 
 ### Add a remote origin and Push
 
@@ -213,15 +210,11 @@ git remote -v
 
 # pushes changes to origin
 git push -u origin main 
-
-
 ```
 
 **NOTE**
 
 On Oct. 1, 2020, any new repositories you create will use main as the default branch, instead of master, It is GitHub's effort to remove unnecessary reference to slavery and replace them with more inclusive term.
-
-
 
 ### Removing Remote Repository
 
@@ -244,9 +237,7 @@ git remote -v
 > origin  https://github.com/OWNER/REPOSITORY.git (push)
 ```
 
-Note: `git remote rm` does not delete the remote repository from the server.  It simply removes the remote and its references from your local repository.
-
-
+**Note**: `git remote rm` does not delete the remote repository from the server.  It simply removes the remote and its references from your local repository.
 
 ### See the changes made to your file
 
@@ -284,6 +275,8 @@ git clone remote_repository_URl
 
 When we push our source code in the remote repository then we can use git ignore to exclude sensitive files likes API keys, passwords and even the local setting files, which is just local to our settings. One example of unwanted file is DS_Store file. 
 
+- You can get pre-built template for gitignore file from this [repository](https://github.com/github/gitignore)
+
 ```bash
 # Create a .gitignore file
 touch .gitignore
@@ -294,6 +287,27 @@ vim .gitignore
 #Then list the files you want to ignore as a list, Example
 .DS_Store
 API/api.html
+```
+
+## Collaboration
+
+![GitWorkFlow](gitworkflow.png)
+
+### Branching and Merging
+
+![branch/merge](branchmerge.png)
+
+```bash
+# Create a branch
+git branch blue
+
+# List the branch, * sign shows the current branch we are in
+git branch
+
+# Let's say you are in main branch and wants to go to blue branch
+git checkout blue
+
+
 
 ```
 
