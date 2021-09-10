@@ -307,8 +307,22 @@ git branch
 # Let's say you are in main branch and wants to go to blue branch
 git checkout blue
 
-
-
-
+# If I want to merge the blue branch again with the main 
+git merge blue
 ```
 
+### Forking and Pull Request
+
+![forking](fork.png)
+
+If you want to learn more about the Git Branching...[go to this site](https://learngitbranching.js.org/)
+
+## References:
+
+- https://www.udemy.com/course/the-complete-web-development-bootcamp/
+
+- https://www.freecodecamp.org/news/learn-the-basics-of-git-in-under-10-minutes-da548267cc91/
+
+- https://www.toolsqa.com/git/difference-between-git-clone-and-git-fork/
+
+  
