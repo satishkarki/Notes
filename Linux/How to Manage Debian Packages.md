@@ -2,17 +2,19 @@
 
 ------
 
-**You can download it from the web browser. So, why go through the trouble of downloading it in the terminal? Well, next time you will have the superpower to download anything, the cool way.**
+> **So, why go through the trouble of downloading in the terminal? Well, next time you will have the superpower to download anything, the cool way.**
+
+### **wget**
 
 The command I am using is **wget** and the URL passed to it is the repository location of **.deb** file.
 
-```
+```bash
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 ```
 
-**wget command syntax**
+wget command syntax
 
-```
+```bash
 wget [options] [URL]
 ```
 
@@ -28,6 +30,8 @@ wget [options] [URL]
 These were some of the basic options with wget. We can change the Wget User-Agent, download multiple files, download via FTP, Create a mirror of a Website, skip certificate check, download to the standard output. Here is the [GNU Wget's dirty manual](https://www.gnu.org/software/wget/manual/wget.html).
 
 ---
+
+### dpkg
 
 Now we have downloaded the file, we need to install the Debian package. **dpkg** is the package manger for Debian. 
 
@@ -46,6 +50,8 @@ dpkg [options...] action
 Learn more about it [here](https://linuxhint.com/manual_install_deb_package_cli_ubuntu/) .
 
 ---
+
+### apt
 
 We can use apt to install the Debian package as well
 

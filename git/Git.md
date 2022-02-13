@@ -1,4 +1,4 @@
-# **Git to Know**
+# Git to Know
 
 -  Version Control System
 
@@ -261,6 +261,10 @@ git add .
 git status # Lists all new or modified files to be committed
 
 git commit -m "Second commit"
+
+git remote add origin https://github.com/satishkarki/blog.git
+
+git branch -M main
 
 git push -u origin main
 ```
