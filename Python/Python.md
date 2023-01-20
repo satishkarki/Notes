@@ -4,13 +4,7 @@
 
 Developed by Guido van Rossum
 
-It is easier for you to learn python than it is for computer to learn english
-
-Elements of Python:
-
-- Vocabulary/Words: Variables and Reserved words
-- Sentence Structure: valid syntax pattern
-- Story Structure: constructing a program for a purpose
+It is easier for you to learn python than it is for computer to learn english.
 
 ### All 33 reserved words in Python 3
 
@@ -85,7 +79,7 @@ Elements of Python:
   # Both gives same output
   ```
 
-- Divison gives float value in Python
+- Division gives float value in Python
 
   ```python
   print(round(9/4, 2))
@@ -362,41 +356,7 @@ for char in password_list:
 print(f"Your password is: {password}")
 ```
 
-While loop
-
-```python
-i=1;
-while not at_goal(): #while at_goal!=True:
-    hurdle()
-    i+=1
 
 
-```
 
-```python
-#Hurdle 4
-
-def turn_right():
-    turn_left()
-    turn_left()
-    turn_left()
-def jump():
-    turn_left()
-    while wall_on_right():
-        move()
-    turn_right()
-    move()
-    turn_right()
-    while not wall_in_front():
-        move()
-    turn_left()      
-while not at_goal():
-    if wall_in_front():
-        jump()
-    else:
-        move()
-
-```
-
-[Link](http://reeborg.ca/reeborg.html?lang=en&mode=python&menu=worlds%2Fmenus%2Freeborg_intro_en.json&name=Hurdle%204&url=worlds%2Ftutorial_en%2Fhurdle4.json)
 

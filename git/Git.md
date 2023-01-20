@@ -89,8 +89,9 @@ From August 13, 2021, GitHub is no longer accepting account passwords when authe
   $ git config --system --unset credential.helper
   
   #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
+  #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
   ```
-
+  
   For other OS follow this [article](https://stackoverflow.com/questions/68775869/support-for-password-authentication-was-removed-please-use-a-personal-access-to)
 
 ## Using GitHub with SSH Key (optional)
