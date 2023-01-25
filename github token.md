@@ -1,3 +1,0 @@
-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
-
-git push https://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@github.com/satishkarki/blog.git
