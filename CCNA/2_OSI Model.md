@@ -1,6 +1,6 @@
 # OSI Model
 
-**Open System Interconnection**
+<u>**Open System Interconnection**</u>
 
 The OSI (Open Systems Interconnection) Model is a conceptual framework used to describe the flow of information between devices in a computer network. The OSI Model is not an actual protocol or piece of software, but rather a model that provides a standardized way of thinking about how data is transmitted between devices.
 
@@ -18,7 +18,7 @@ By dividing the information transmission process into these seven layers, the OS
 
 
 
-**Difference between OSI and TCP/IP Model**
+<u>**Difference between OSI and TCP/IP Model**</u>
 
 The TCP/IP model and the OSI model are both frameworks used to describe how data is transmitted between devices in a computer network. However, there are some key differences between the two models:
 
@@ -31,5 +31,17 @@ Despite these differences, both models are used in different ways to help unders
 
 
 
-**Encapsulation**
+**<u>Encapsulation</u>**
+
+Encapsulation is done in different layers of a computer network, with each layer adding its own header and trailer to the data. Here's a brief overview of how encapsulation is done in each layer:
+
+1. Application Layer: At the application layer, the data being transmitted is divided into smaller units, or packets, for transmission over the network. This layer also adds any necessary information about the data, such as the type of data being transmitted, to the packet.
+2. Presentation Layer: At the presentation layer, the data packet may be encrypted or compressed to ensure that it is secure during transmission. The presentation layer also ensures that the data is formatted in a way that can be understood by the next layer.
+3. Session Layer: At the session layer, the data packet is divided into smaller segments if necessary, and a session header is added to the packet. The session header includes information about the session, such as the source and destination of the data.
+4. Transport Layer: At the transport layer, a transport header is added to the data packet. The transport header includes information about the type of transmission, such as whether the transmission is reliable or unreliable, and information about flow control and error checking.
+5. Network Layer: At the network layer, a network header is added to the data packet. The network header includes information about the source and destination of the data, as well as the routing information needed to deliver the data over the network.
+6. Data Link Layer: At the data link layer, a data link header and trailer are added to the data packet. The data link header includes information about the source and destination of the data, and the trailer includes error-checking information to ensure that the data is transmitted accurately.
+7. Physical Layer: At the physical layer, the data packet is converted into a stream of bits for transmission over the network. The physical layer also adds any necessary electrical or mechanical signals to the data, such as voltages or frequencies, to ensure that the data is transmitted accurately over the physical connection.
+
+Each layer in a computer network encapsulates the data in its own unique way, providing the necessary information to ensure that the data is transmitted effectively and efficiently over the network.
 

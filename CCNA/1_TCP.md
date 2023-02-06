@@ -1,6 +1,6 @@
 # Network Communication Model
 
-**TCP**
+<u>**TCP**</u>
 
 TCP stands for Transmission Control Protocol, and it's like a set of rules for sending information over the internet. Imagine you want to send a letter to someone through the mail. You write the letter, put it in an envelope, and write the address on the envelope. This is similar to sending information over the internet.
 
@@ -10,7 +10,7 @@ This is important for things like sending emails, downloading files, or browsing
 
 
 
-**How TCP Works**
+<u>**How TCP Works**</u>
 
 - Segment: A segment is a piece of the information being sent over the internet, kind of like a page of a book. TCP takes the information you want to send and breaks it into smaller segments to make it easier to send and receive.
 - Flow control: This is like a traffic light for the information being sent over the internet. It makes sure that too much information isn't sent at once and helps prevent traffic jams.
@@ -18,7 +18,7 @@ This is important for things like sending emails, downloading files, or browsing
 - Error checking: This is like a spell checker for the information being sent over the internet. It makes sure that the information hasn't changed or gotten mixed up during transit, and if it has, it asks to send it again.
 - Re-transmission: If something goes wrong during the transmission of a segment, the recipient will ask the sender to send it again. This is called re-transmission, and it helps make sure that the information you send arrives exactly as you sent it.
 
-**How TCP three way handshake works?**
+<u>**How TCP three way handshake works?**</u>
 
 The TCP three-way handshake is a key aspect of how the TCP protocol ensures reliable communication over the internet. Here's a bit more detail on each step of the process:
 
