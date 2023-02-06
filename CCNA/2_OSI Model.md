@@ -1,6 +1,6 @@
 # OSI Model
 
-<u>**Open System Interconnection**</u>
+### **Open System Interconnection**
 
 The OSI (Open Systems Interconnection) Model is a conceptual framework used to describe the flow of information between devices in a computer network. The OSI Model is not an actual protocol or piece of software, but rather a model that provides a standardized way of thinking about how data is transmitted between devices.
 
@@ -18,7 +18,7 @@ By dividing the information transmission process into these seven layers, the OS
 
 
 
-<u>**Difference between OSI and TCP/IP Model**</u>
+### **Difference between OSI and TCP/IP Model**
 
 The TCP/IP model and the OSI model are both frameworks used to describe how data is transmitted between devices in a computer network. However, there are some key differences between the two models:
 
@@ -31,7 +31,7 @@ Despite these differences, both models are used in different ways to help unders
 
 
 
-**<u>Encapsulation</u>**
+### **Encapsulation**
 
 Encapsulation is done in different layers of a computer network, with each layer adding its own header and trailer to the data. Here's a brief overview of how encapsulation is done in each layer:
 
