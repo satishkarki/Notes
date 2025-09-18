@@ -9,5 +9,9 @@ Example: Whenever I push my local repo to github using this command `git push or
 
 An event is a specific activity in a repo that triggers a workflow run. Im my case `git push` command.
 
+![Jobs](/Notes/Git%20Action/Github%20Jobs.png)
 
+Here on the ss, `build` and `deploy` are two jobs. These jobs are exected in the `runner`. If we look at the build job, it is made of 9 steps. 
+
+`Runner` is a server that runs your workflows. GitHub provides Ubuntu Linux, Microsoft Windows, and macOS runners to run your workflows. Each workflow run executes in a fresh, newly-provisioned virtual machine.
 
