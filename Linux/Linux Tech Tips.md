@@ -91,6 +91,7 @@ $ rmdir dir # Remove Directory
 ```
 ---
 ## Intermediate Command
+### grep
 ```bash
 $ grep root /etc/passwd
 # Output
@@ -98,10 +99,12 @@ root:x:0:0:root:/root:/bin/bash
 nm-openvpn:x:121:122:NetworkManager OpenVPN,,,:/var/lib/openvpn/chroot:/usr/sbin/nologin
 ```
 
-less displays the content of a very large file one screenful at a time. To go to next page press space, to go back, press b, to quit q
+It lets display the content of a very large file one screenful at a time. To go to next page press space, to go back, press b, to quit q
 ```bash
 $ grep ie /usr/share/dict/words | less
 ```
+---
+
 ```bash
 # print working directory
 $ pwd
@@ -118,4 +121,165 @@ CCNA: directory
 $ file ./CCNA/CISCO\ commands 
 ./CCNA/CISCO commands: very short file (no magic)
 ```
+---
+### Find
+```bash
+# Find and Locate
+$ find dir -name file -print
+# Example
+find /var/www          -type f          -name "*.php"           -path "*/wp-content/*"
+   │                        │                 │                        │
+   │                        │                 │                        │
+Where to start           Only regular      Filename must           Full path must
+the search               files             end with .php           contain /wp-content/
+```
+Scenario
+```bash
+/var/www
+├── site1
+│   ├── wp-content          ← matches
+│   │   └── themes
+│   │       └── style.php
+│   └── index.php           ← does NOT match (no wp-content in path)
+├── site2
+│   ├── cache               ← does NOT match
+│   └── somefile.php
+└── old-projects
+    └── wordpress-2023
+        └── wp-content      ← matches
+            └── plugins
+                └── plugin.php
+```
+```bash
+# Find 
+$ find /var/www -type f -name "*.php" -path "*/wp-content/*"
+
+# Output
+/var/www/site1/wp-content/themes/style.php
+/var/www/old-projects/wordpress-2023/wp-content/plugins/plugin.php
+```
+```bash
+# Head and Tail
+$ head /etc/passwd # First 10 lines
+$ tail /etc/passwd #  Last 10 lines
+
+$ head -5 /etc/passwd # First 5 lines only
+```
+---
+### Shell Variable and Environment Variable
+```bash
+# 1. Normal shell variable (local only)
+count=42
+
+echo $count          # → 42
+bash                 # open new shell
+echo $count          # → (empty)
+exit                 # back to original shell
+echo $count          # → 42 (still exists here)
+
+# 2. Environment variable (inherited)
+export NAME="John"
+
+echo $NAME           # → John
+bash                 # new shell
+echo $NAME           # → John (inherited!)
+exit
+
+# 3. Most common real-life pattern
+export PATH="$HOME/bin:$PATH"           # add your own bin folder permanently
+export EDITOR=nano                      # set default editor
+export LANG=en_US.UTF-8                 # set language
+```
+```bash
+# Command Path
+$ echo $PATH # list of folders your shell searches
+/usr/local/sbin:/usr/local/bin:...
+
+# type: tells you what the shell will actually run when you type a command
+$ type ls
+ls is aliased to `ls --color=auto`
+
+$ which ls
+/usr/bin/ls
+
+$ which -a ls
+/usr/bin/ls
+/bin/ls
+```
+```bash
+# Modifying Path -Temporary
+# Disappears after session is closed
+
+# Add a directory at the BEGINNING (highest priority)
+export PATH="/new/path:$PATH"
+
+# Add at the END (lowest priority)
+export PATH="$PATH:/new/path"
+
+# Example - add your personal bin folder
+export PATH="$HOME/.local/bin:$PATH"
+```
+```shell
+# Permanent Modification
+# 1. First check which shell you are using
+$ echo $SHELL
+/bin/bash
+
+# 2. Edit Shell's start up file
+# For bash users (most common on Ubuntu, Debian, Fedora, etc.)
+$ nano ~/.bashrc
+#     or
+$ vim ~/.
+
+# 3. Add path
+# Option A - Add at the beginning (recommended - your programs first)
+$ export PATH="$HOME/.local/bin:$PATH"
+
+# Option B - Add at the end (system programs first)
+$ export PATH="$PATH:$HOME/my-custom-scripts"
+
+# Option C - Multiple additions
+$ export PATH="$HOME/bin:$HOME/.local/bin:/opt/mytool/bin:$PATH"
+
+# 4. Apply the changes
+$ source ~/.bashrc
+
+# 5. Verify
+$ echo $PATH
+```
+---
+### Command Line Editing
+```bash
+# Holy trinity — 80% of your editing power
+Ctrl + A          → beginning
+Ctrl + E          → end
+Ctrl + W          → delete last word
+Ctrl + U          → delete everything before cursor
+Ctrl + K          → delete everything after cursor
+Ctrl + R          → search history (type and press repeatedly)
+Ctrl + L          → clear screen (keep command)
+
+# Bonus power combo
+Ctrl + W Ctrl + Y → cut last word → paste it somewhere else
+```
+---
+### man page
+Online Manual Section
+
+| Section | What it contains                          | Typical examples                              |
+|---------|-------------------------------------------|-----------------------------------------------|
+| 1       | Executable programs / commands            | ls, grep, cat, passwd (the command)           |
+| 2       | System calls (kernel functions)           | fork, open, read, write                       |
+| 3       | Library functions                         | printf, strlen, malloc                        |
+| 4       | Special files (devices)                   | /dev/sda, /dev/null                           |
+| 5       | File formats and conventions              | passwd, shadow, hosts, crontab                |
+| 6       | Games                                     | tetris, nethack                               |
+| 7       | Miscellaneous (protocols, standards, etc.)| regex, utf-8, systemd.unit                    |
+| 8       | System administration commands            | useradd, systemctl, fdisk                     |
+
+```bash
+man passwd # shows the command passwd (how to change passwords) → section 1
+man 5 passwd # shows the file format of /etc/passwd → section 5
+```
+---
 
