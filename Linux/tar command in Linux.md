@@ -1,9 +1,16 @@
 
 
-tar stands for tape archive. It is used to create an archive or extract the archive. A compressed or uncompressed archive can be created with it. A file with tar extension is commonly called "tarball".
+`tar` stands for tape archive. It is used to create an archive or extract the archive. A compressed or uncompressed archive can be created with it. A file with tar extension is commonly called "tarball".
 
-***
+* `file.tar.gz` - means archived and compressed
+* `file.gz` - means only compressed, simple `gzip` and `gunzip` command works with it.
 
+
+> Archive = bundling / packaging multiple things together
+
+> Compress = shrinking / squeezing to save space
+
+---
 ## Syntax
 
 ```bash
@@ -56,6 +63,23 @@ cd PACKAGENAME
 make
 sudo make install
 ```
+---
+
+## zip/unzip
+
+for files ending with `.zip`, we can use the zip and unzip command. Here is a list of some of the mst useful commands.
+
+| Command                              | What it does                                      | When you need it                          |
+|--------------------------------------|---------------------------------------------------|-------------------------------------------|
+| `unzip file.zip`                     | Extract everything to current folder              | Basic extract                             |
+| `unzip file.zip -d myfolder`         | Extract into a specific folder                    | Avoid mess in current directory           |
+| `unzip -l file.zip`                  | List contents (don't extract)                     | Check what's inside first                 |
+| `unzip file.zip somefile.txt`        | Extract only specific file(s)                     | Need just one file                        |
+| `zip -r archive.zip folder/`         | Zip a whole folder recursively                    | Most common "backup / share folder"       |
+| `zip -r archive.zip .`               | Zip everything in current directory               | Quick full current-folder archive         |
+| `zip -r -9 archive.zip folder/`      | Zip with maximum compression                      | When file size really matters             |
+| `zip -u archive.zip newfile.txt`     | Add / update file in existing zip                 | Incrementally add files later             |
+
 
 
 
