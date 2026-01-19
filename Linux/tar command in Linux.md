@@ -1,5 +1,4 @@
 
-
 `tar` stands for tape archive. It is used to create an archive or extract the archive. A compressed or uncompressed archive can be created with it. A file with tar extension is commonly called "tarball".
 
 * `file.tar.gz` - means archived and compressed
@@ -80,8 +79,4 @@ for files ending with `.zip`, we can use the zip and unzip command. Here is a li
 | `zip -r -9 archive.zip folder/`      | Zip with maximum compression                      | When file size really matters             |
 | `zip -u archive.zip newfile.txt`     | Add / update file in existing zip                 | Incrementally add files later             |
 
-
-
-
-
-
+---

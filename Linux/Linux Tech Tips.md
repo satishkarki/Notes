@@ -378,7 +378,7 @@ Modern sudo includes all files from `/etc/sudoers.d/`. This is cleaner than edit
    ls -l /etc/sudoers.d/ # Should show -r--r----- root root
    sudo whoami
    ```
-
+---
 
 
 
