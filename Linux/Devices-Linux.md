@@ -325,6 +325,9 @@ Here is a high-level overview of `Linux SCSI subsystem`
           (SATA cables, SAS expanders, FC fabric, USB, Ethernet…)
 ```
 
+![Subsystem](Linux/assets/Device-Linux/subsystem.png)
+
+
 ***Example: My Proxmox Devices***
 ```bash
 root@pve:~# lsscsi
@@ -345,4 +348,8 @@ root@pve:~# lsscsi
 [N:2:4:1]    disk    PM981a NVMe Samsung 512GB__1               /dev/nvme2n1
 [N:3:1:1]    disk    PC401 NVMe SK hynix 512GB__1               /dev/nvme3n1
 ```
-
+```bash
+# list USB devices
+$ lsusb
+```
+Next we will look in details on how to work with disks on a Linux system.
