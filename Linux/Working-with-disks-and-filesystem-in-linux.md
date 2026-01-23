@@ -36,5 +36,29 @@ Disk Flags:
 Number  Start   End     Size    Type      File system  Flags
  1      1049kB  2000GB  2000GB  primary   ntfs         lba
  ```
+```bash
+# Output of fdisk -l 
+sudo fdisk -l
+Disk /dev/ram0: 4 MiB, 4194304 bytes, 8192 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
 
 
+Disk /dev/ram1: 4 MiB, 4194304 bytes, 8192 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+```
+
+	
+
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+> Which one to choose: `fdisk` or `parted` ? 
+
+{: .prompt-tip }
+<!-- markdownlint-restore -->
+With fdisk, you design your new partition table before making the actual changes to the disk, and it makes changes only when you exit the program. But with the parted, partitions are created, modified, and removed as you issue the command.
+
+### Creating a Partition Table
