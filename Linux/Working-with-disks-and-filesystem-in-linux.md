@@ -1,4 +1,4 @@
-After knowing how the Linux Kernel presents devices to userspace. Now its to look at how we can partition disks, create and maintain filesystems that goes inside disk partitions, and work with the swap space.
+After knowing how the Linux Kernel presents devices to userspace. Now its time to look at how we can partition disks, create and maintain filesystems that goes inside disk partitions, and work with the swap space.
 
 ## Partitioning Disk Devices
 * Partitons are the subdivisons of the whole disk
@@ -198,6 +198,7 @@ sudo mkfs.vfat -F 32 /dev/sdc1     # Create FAT32 for USB drive
 sudo mkfs.btrfs -L mypool /dev/sdd # Create Btrfs with label "mypool"
 ```
 ***Behind the Hood***
+
 `mkfs` is the front end, it is a symlink to a series of file creation utilities in '`sbin`.
 
 ```bash
@@ -217,5 +218,107 @@ lrwxrwxrwx 1 root root     6 Apr  8  2024 /sbin/mkfs.ntfs -> mkntfs
 lrwxrwxrwx 1 root root     8 Mar 31  2024 /sbin/mkfs.vfat -> mkfs.fat
 ```
 ### Mounting a FileSystem
+In Unix, the process of attaching a filesystem to a running system is called `mounting`. 
+
+```bash
+$ mount
+# OR
+$ findmnt
+```
+```bash
+# Output
+/dev/sdd on / type ext4 (rw,relatime,discard,errors=remount-ro,data=ordered)
+none on /mnt/wslg type tmpfs (rw,relatime)
+sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,noatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,noatime)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,noatime,gid=5,mode=620,ptmxmode=000)
+binfmt_misc on /proc/sys/fs/binfmt_misc type binfmt_misc (rw,relatime)
+...
+```
+If we look at the above output, we see a general format:
+```bash
+device_or_source on mount_point type filesystem_type (options)
+# options are the comma seperated mount flags
+```
+Also, other than sda,sdb, we see sysfs, none, proc etc, what does it mean?
+
+* `none` : no real device block
+* `sysfs on /sys` : virtual filesystem exposing kernel device/driver info
+* `proc on /proc` : Virtual FS for process info, kernal parameters, stats
+* `tmpfs` : RAM-based filesystems 
+
+***How to mount***
+```bash
+$ mount -t type device mountpoint
+
+# Example :
+$ mount -t ext4 /dev/sdf2/ /home/extra
+```
+***How to unmount***
+```bash
+$ unmount mountpoint
+```
+### Filesystem UUID
+UUID : Universally Unique Identifier
+```bash
+ $ blkid # block ID
+ $ mount UUID=XXXX-XXXX-XXXX /home/extra
+ ```
+### Disk Buffer
+In Linux system, the kernel doesn't ususally immediately write to adevice. It caches it to RAM. `sync` tells the kernel to flush all dirty buffer (modified data in memory) to their respective block device immediately.
+
+```bash
+# before removing USB
+$ sync
+
+$ sync && sudo reboot
+
+$ sync /dev/sdb
+```
+### The `/etc/fstab` Filesystem Table
+`/etc/fstab` (often just called fstab) is a plain-text configuration file in Linux that tells the system which filesystems to mount automatically at boot, and how to mount them (options, mount point, etc.).
+
+```bash
+<device>  <mount point>  <filesystem type>  <mount options>  <dump>  <fsck pass>
+```
+```bash
+# Example
+UUID=abcd1234-5678-90ef-ghij-klmnopqrstuv  /home  ext4  defaults,noatime,discard  0  2
+```
+### File System Capacity
+`df` stands for disk free and shows disk space usage.
+
+```bash
+$ df
+$ df -h # Human-Readable form
+$ df -i # Show inode usage
+```
+
+```bash
+# Example:
+Filesystem     1K-blocks      Used Available Use% Mounted on
+/dev/sda1      104857600   45236892  54520408  46% /
+/dev/sda2      209715200  123456789  86258311  59% /home
+tmpfs           4194304     123456   4070848   3% /run
+/dev/sdb1       976762584  876543210 100219374  90% /mnt/backup
+```
+### Checking and Repairing File systems
+`fsck` - file system check
+```bash
+# Must be unmounted! (or read-only for root in recovery)
+sudo fsck /dev/sda1
+sudo fsck -f /dev/sda1          # force check even if clean
+sudo fsck -y /dev/sda1          # auto-answer "yes" to all fixes (dangerous but convenient)
+sudo fsck -C /dev/sda1          # show progress bar
+```
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable -->
+> Never run `fsck` on a mounted filesystem (except read-only with `-n`)
+{: .prompt-warning }
+<!-- markdownlint-restore -->
+```bash
+sudo fsck -n /dev/sda1   # check only, no changes (safe on mounted FS)
+```
+## Swap Space
 
 
