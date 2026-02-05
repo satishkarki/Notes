@@ -320,5 +320,21 @@ sudo fsck -C /dev/sda1          # show progress bar
 sudo fsck -n /dev/sda1   # check only, no changes (safe on mounted FS)
 ```
 ## Swap Space
+Swap is the space in storage device where the operating system creates virtual memory, if it runs out of the real memory. 
 
+```bash
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       4.5Gi       2.5Gi       829Mi       9.0Gi        11Gi
+Swap:          4.0Gi          0B       4.0Gi
+```
+***Creating and managing Swap***
+```bash
+sudo fdisk /dev/sda   # create partition type 82 (A dedicated partition (type 82 in fdisk, 8200 in GPT))
+sudo mkswap /dev/sdaX
+sudo swapon /dev/sdaX
+# Add to /etc/fstab:
+UUID=abcd-1234  none  swap  sw  0  0
+```
+## Logical Volume Manager
 
