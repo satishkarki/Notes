@@ -338,3 +338,73 @@ UUID=abcd-1234  none  swap  sw  0  0
 ```
 ## Logical Volume Manager
 
+![LVM](Linux/assets/Wroking-with-filesystem/LVM.webp)
+
+Logical Volume Manager (LVM) is a flexible storage management system in Linux that sits between physical disks/partitions and filesystems. It allows you to abstract, pool, resize, and manage storage much more dynamically than traditional fixed partitions.
+
+***Quick Viewing Commands***
+| Command       | Description                  |
+|---------------|------------------------------|
+| `pvs`         | physical volumes             |
+| `vgs`         | volume groups                |
+| `lvs`         | logical volumes              |
+| `lvdisplay`   | detailed view                |
+| `vgdisplay -v`| show free space, etc.        |
+
+***Example***
+
+Imagine I have two devices `sdb1` and `sdc1`, 5GB and 15 GB respectively. How I will create two LVs with 10GB space each?
+
+Step 1: Convert the partitions `/dev/sdb1` and `/dev/sdc1` into PVs.
+
+```bash
+$ sudo pvcreate /dev/sdb1
+$ sudo pvcreate /dev/sdc1
+
+# verify
+$ sudo pvs 
+```
+Step 2: Combine the PVs into a single VG named `myvg`.
+```bash
+$ sudo vgcreate myvg /dev/sdb1 /dev/sdc1
+
+# Verify
+$ sudo vgs
+```
+Step 3: Create two 10GB LVs named `lv1` and `lv2` from `myvg`.
+```bash
+$ sudo lvcreate -L 10G -n lv1 myvg
+$ sudo lvcreate -L 10G -n lv2 myvg
+
+# Verify
+$ sudo lvs
+```
+Step 4: Format each LV as ext4 (creates the "partitions").
+```bash
+sudo mkfs.ext4 /dev/myvg/lv1
+sudo mkfs.ext4 /dev/myvg/lv2
+```
+Step 5: Mount them (optional, for testing):
+```bash
+sudo mkdir /mnt/lv1 /mnt/lv2
+sudo mount /dev/myvg/lv1 /mnt/lv1
+sudo mount /dev/myvg/lv2 /mnt/lv2
+```
+Now lets say, I don't want the second LV and want to remove it and add that space to first LV.
+
+```bash
+sudo umount /mnt/lv2 # unmount
+
+sudo lvremove /dev/myvg/lv2 # remove the LV
+
+sudo lvs # confirm removal
+
+sudo lvextend -L +10G /dev/myvg/lv1 # Extend lv1 by 10GB (to 20GB total)
+
+sudo resize2fs /dev/myvg/lv1 # Resize the ext4 filesystem to fill the new space
+
+sudo lvs # verify
+df -h /mnt/lv1  # if mounted
+```
+
+### The LVM Implementation
