@@ -9,3 +9,4 @@ Firmware
            -> execve("/sbin/init")  => PID 1
               -> userspace boot continues
 ```
+
