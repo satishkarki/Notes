@@ -55,5 +55,47 @@ Bootloader uses BIOS/UEFI to access disks. And modern bootloader has the capabil
 ### GRUB
 GRand Unified Bootloader (GRUB 2): its core job is to select and load a kernel + initramfs + cmdline, then jump into the kernel.
 
+![alt text](assets/Kernel-boot/grub-menu.png)
+
+ To access the GRUB menu, press and hold `SHIFT` when BIOS or firmware startup screen first appears. Then press `ESC` to temporarily disable the automatic boot timeout after the GRUB menu appears.
+
+You can view the GRUB config editor pressing `e` or comamnd line with `c`.
+
+Lets not get into the weeds with the commands in GRUB CLI. 
+
+***grub.cfg***
+```bash
+# Location in most distro
+/boot/grub/grub.cfg
+```
+It is not recommended to hand-edit .cfg file for permanent change. Its usually auto generated and updates (kernal updates, update-grub, package upgrades) can overwrite it.
+
+***Where is GRUB installed?***
+
+You install GRUB as an EFI program onto the EFI System Partition (ESP) (a small FAT32 partition, usually mounted at /boot/efi). Then you create a UEFI boot entry in NVRAM (or place a fallback file).
+
+```bash
+$ findmnt /boot/efi #Ensure ESP is mounted
+$ sudo mount /dev/nvme0n1p1 /boot/efi # mount if not
+$ sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB # Install GRUB EFI
+$ sudo grub-mkconfig -o /boot/grub/grub.cfg # Generate config
+```
+On Ubuntu/Debian you often use `sudo update-grub`, which runs the above generation step.
+
+***What files get created***
+
+You’ll typically see something like:
+
+> /boot/efi/EFI/GRUB/grubx64.efi (the EFI executable)
+
+> /boot/grub/grub.cfg (menu/config)
+
+> /boot/grub/x86_64-efi/* (GRUB modules)
+
+***Where this sits in the boot chain***
+
+> UEFI: Firmware → grubx64.efi on ESP → GRUB menu → kernel
+
+
 
 
