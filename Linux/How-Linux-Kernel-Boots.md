@@ -1,3 +1,5 @@
+![Boot Loader](assets/Kernel-boot/bootloader.png)
+
 ## A mental model of boot process
 ```bash
 Firmware
@@ -95,6 +97,17 @@ You’ll typically see something like:
 ***Where this sits in the boot chain***
 
 > UEFI: Firmware → grubx64.efi on ESP → GRUB menu → kernel
+
+
+## TLDR
+The boot process in Linux is a step-by-step handoff from hardware to software, ending with user-level processes (like your shell or desktop environment).
+
+Here's a simplified overview:
+1. BIOS/UEFI Boots: Your computer's firmware loads the bootloader (e.g., GRUB) from the disk.
+2. Bootloader Loads Kernel: GRUB finds and loads the Linux kernel into memory.
+3. Kernel Initializes: The kernel sets up hardware (CPU, memory, devices), mounts the root filesystem (usually /), and then looks for init.
+4. Kernel Starts Init: The kernel executes /sbin/init (or whatever init program is configured). This is where init takes over.
+
 
 
 
