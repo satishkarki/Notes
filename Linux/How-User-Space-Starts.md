@@ -215,4 +215,149 @@ Key difference: reload vs restart
 | `systemctl suspend`      | Suspends the system to RAM (quick resume, low power usage)                   |
 | `systemctl daemon-reload`| Reloads systemd manager configuration (must run after editing any unit files) |
 
-### systemd process tracking and synchronization
+### systemd process tracking
+
+Before diving into it, lets look at the `cgroups` -short for control groups.
+
+Cgroups are a Linux kernel feature that lets you group processes together and control/limit/monitor how much of the system's resources they can use.
+
+How Cgtoups Work?
+
+1. Hierarchical — Like a folder tree
+
+   * You can have parent groups and child groups.
+
+   * Child inherits some limits from parent (child can't use more than parent allows).
+
+2. Controllers — These are the "rule types"
+
+   * cpu controller → limits CPU shares/quotas
+   * memory controller → sets memory limits, tracks usage
+   * io controller → limits disk I/O
+   * pids controller → limits number of processes
+   * devices → controls device access
+3. The filesystem interface (cgroupfs)
+   * Cgroups appear as a special filesystem (usually mounted at /sys/fs/cgroup/).
+You create "folders" (cgroups), move processes (PIDs) into them, and write numbers to files to set limits.
+
+***Example***
+A very simplified, manual way
+
+```bash
+# Create a cgroup called "my-limited-group" under cpu controller
+mkdir /sys/fs/cgroup/cpu/my-limited-group
+
+# Limit it to ~20% of one CPU
+echo 20000 > /sys/fs/cgroup/cpu/my-limited-group/cpu.cfs_quota_us
+
+# Move a process (PID 1234) into it
+echo 1234 > /sys/fs/cgroup/cpu/my-limited-group/tasks
+```
+***Useful Command***
+```bash
+# See the cgroup tree (very visual!)
+$ systemd-cgls
+```
+```bash
+# output
+CGroup /:
+-.slice
+├─user.slice
+│ └─user-1000.slice
+│   ├─user@1000.service …
+│   │ └─init.scope
+│   │   ├─652 /usr/lib/systemd/systemd --user
+│   │   └─655 (sd-pam)
+│   └─session-1.scope
+│     ├─606 /bin/login -f
+│     └─672 -bash
+├─init.scope
+│ ├─   1 /sbin/init
+│ ├─   2 /init
+│ ├─   7 plan9 --control-socket 7 --log-level 4 --server-fd 8 --pipe-fd 10 --lo>
+│ ├─ 603 /init
+│ ├─ 604 /init
+│ ├─ 605 -bash
+│ ├─ 827 /init
+│ ├─ 828 /init
+...
+...
+```
+As we saw , how the Cgroup works, I think we have answered the question of process tracking. Systemd uses Linux control groups (cgroups) as the foundation for accurate, kernel-enforced process tracking.
+
+### systemd process synchronization
+`How Units wait for each other without chaos?`
+
+ Lets look at two different ideas:
+ * Ordering: `After=`/`Before=`
+   * when something should happen — "do A before B"
+* Requirement: `Requires=`/`Wants=`
+   * whether something must succeed — "B only runs if A works"
+
+***Common Combinations we see in practice***
+| Situation you want                              | What to write in your service unit file       | Explanation                                                                 |
+|-------------------------------------------------|-----------------------------------------------|-----------------------------------------------------------------------------|
+| Start after X, and X must succeed               | `After=X` + `Requires=X`                      | Classic & safest pattern (most services do this)                            |
+| Start after X, but X failing is OK              | `After=X` + `Wants=X`                         | Common for "nice to have" things (logging, monitoring agents)              |
+| Just make sure X is started too, order doesn't matter | `Requires=X` (no `After=`)                    | Rare — usually you still want ordering                                      |
+| I must finish before Y starts                   | `Before=Y`                                    | Used in setup/preparation units (e.g. mountfs before services)             |
+
+***Example of unit file***
+```bash
+[Unit]
+After=network-online.target
+Wants=network-online.target
+```
+During boot systemd basically asks:
+"Has network-online.target finished? No? -> hold all units that depend on it"
+
+A typical web server unit:
+```bash
+[Unit]
+Description=My Web App
+After=network-online.target postgresql.service
+Requires=network-online.target postgresql.service
+```
+
+***How systemd decides when a unit has successfully started ?***
+
+When another unit has `After=myapp.service` or `Requires=myapp.service`, systemd needs to know:
+
+"When is myapp.service considered 'done' / 'active' so I can start?"
+
+The answer depends on the `Type=` setting in `myapp.service`:
+
+Here are the list of Types, I will not go into the weeds of what each of them do.
+
+* Type=simple
+* Type=exec
+* Type=forking
+* Type=oneshot
+* Type=notify
+* Type=notify-reload
+* Type=dbus
+* Type=idle
+
+***Useful commands***
+```bash
+# See what has to finish before multi-user.target
+systemctl list-dependencies multi-user.target
+
+# See reverse: what waits for your service
+systemctl list-dependencies --reverse nginx.service
+
+# See the whole boot chain visually
+systemd-analyze plot > boot.svg    # open the .svg in a browser
+
+# List all active sockets (many are waiting for demand)
+systemctl list-units --type=socket
+
+# See how much boot time each unit took
+systemd-analyze blame   # top offenders
+
+# Check if a service is socket-activated
+systemctl status sshd
+# Look for "TriggeredBy: • sshd.socket"
+```
+
+### systemd On-Demand and Resource-Parallelized Startup
