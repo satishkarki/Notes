@@ -361,3 +361,37 @@ systemctl status sshd
 ```
 
 ### systemd On-Demand and Resource-Parallelized Startup
+
+***On-Demand***
+
+Let's look at On-Demand startup  concept first with classic `sshd.socket` + `sshd.service` example
+
+* `sshd.socket` listens on port 22
+* `sshd.service` is not started at boot
+* First SSH login attempts -> systemd starts sshd and pass the connection
+* Result: sshd uses ~0 resources until someone actually logs in
+
+***resource-parallelized startup***
+
+Now let's look at the resource-parallelized startup with this figure:
+
+![resource-parallelized](assets/How-user-space-starts/image.png)
+
+**Key Concept**
+
+* Units A, B, C, E → Actual services/daemons that need to start during boot.
+* Unit R → A resource unit (not a real service/process). It acts as a placeholder or stand-in for something that Unit E provides (e.g., a listening socket, a D-Bus name, a readiness signal, or an interface).
+* Unit E → The service that actually provides the resource (e.g., the daemon that opens a socket, starts a database listener, or acquires a D-Bus name).
+
+The timeline shows:
+
+* Unit R is marked "Available" from the very beginning (even before boot reaches user space fully).
+* Units A, B, C, and E all begin starting in parallel right away.
+* Unit E starts up normally, but systemd provides a fake/temporary interface for Unit R while E is still initializing.
+* Once Unit E finishes startup and is truly ready, it takes over from the placeholder Unit R (the real resource becomes available).
+* Units A, B, C (and any others that depend on R) can proceed without waiting for E to finish — they use the placeholder if needed early, or the real resource if they access it later.
+
+
+## Shutting down your system
+
+
