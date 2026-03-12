@@ -393,5 +393,37 @@ The timeline shows:
 
 
 ## Shutting down your system
+High- Level Overview:
 
+No matter the init system, shutdown/reboot follows roughly these steps:
 
+* User/admin triggers the action (e.g., shutdown, reboot, poweroff, or GUI button).
+* Init (PID 1) receives the signal or command.
+* Services are stopped in reverse dependency order (or as configured).
+* Filesystems are unmounted (or remounted read-only).
+* Swap is disabled.
+* Final sync to disk.
+* Kernel is told to halt, power off, or reboot.
+
+***Useful commands***
+```bash
+# Normal shutdown / power off
+sudo systemctl poweroff
+
+# Reboot now
+sudo systemctl reboot
+
+# Sleep / suspend laptop
+systemctl suspend
+
+# Schedule shutdown in 10 minutes
+sudo shutdown -h +10 "System will shut down in 10 minutes"
+
+# Cancel scheduled shutdown
+sudo shutdown -c
+
+# Force (emergency only – may lose data!)
+sudo systemctl poweroff --force
+```
+
+Next we will look at System Configuration: Logging, System Time, Batch Jobs and Users.
