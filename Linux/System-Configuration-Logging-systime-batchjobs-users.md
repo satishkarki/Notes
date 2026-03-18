@@ -116,4 +116,83 @@ Logfile rotation in Linux manages growing log files by periodically "rotating" t
 3. Execution mechanism
     * Debian/Ubuntu family: Usually a script in `/etc/cron.daily/logrotate` (runs via anacron or cron once per day).
     * Fedora/RHEL family: Same approach — `/etc/cron.daily/logrotate` script, but sometimes systemd timers can be involved in newer setups.
+
 ## User Management Files
+Linux handles user accounts using a few key plaintext configuration files in `/etc/`. These files map human-friendly usernames to the numeric IDs the kernel actually uses, store authentication data, and define groups for permissions.
+
+1. ***/etc/passwd -The main user account database***
+
+    ```bash
+    # username:password:UID:GID:GECOS:home_directory:shell
+
+    karking:x:1000:1000:Karking User,,,:/home/karking:/bin/bash
+    ```
+    The password field can be:
+
+    * `x` meaning look in `/etc/shadow`
+    * `*` means account is locked/disabled
+    * `::` blank field means no password at all
+2. ***/etc/shadow - secure password and account expiry store***
+
+    ```bash
+    # username:encrypted_password:lastchg:min:max:warn:inactive:expire:reserved
+
+    root:$6$abc123...longhash...:18973:0:99999:7:::
+    karking:$6$xyz456...anotherhash...:19500:0:99999:7:::
+    ```
+    Only root (and certain privileged processes) can read it. It stores the actual encrypted passwords plus password-ageing rules.
+
+3. ***/etc/group - Group Definitions***
+
+    Groups let multiple users share files without giving everyone full access. Each group has a name and a GID.
+
+    ```bash
+    # group_name:group_password:GID:user_list
+
+    root:*:0:juser
+    daemon:*:1:
+    users:*:1000:alice,bob,carol
+    ```
+### Special Users
+Special users (also called pseudo-users or system users) in Linux are accounts that do not correspond to real human beings. They exist so that system services, daemons, and files can run with specific, limited privileges instead of running everything as root.
+
+***Typical special users in `/etc/passwd`***
+
+* root (UID 0) — Superuser / administrator
+* daemon (UID 1) — Generic system daemon user
+* bin (UID 2) — Owner of legacy binary directories (mostly historical)
+* man (UID 6) — Owns manual page files
+
+### passwd command
+
+```bash
+# Basic Use
+$ passwd
+```
+```bash
+$ passwd
+Changing password for karking.
+Current password: ********
+New password: ****************
+Retype new password: ****************
+passwd: password updated successfully
+```
+```bash
+# Change another user's password (as root or with sudo)
+$ sudo passwd username
+```
+
+***passwd usecase***
+
+| Command                        | What it does                                                      | Who can use it   | Example                          |
+|--------------------------------|-------------------------------------------------------------------|------------------|----------------------------------|
+| `passwd`                       | Change your own password                                          | Any user         | `passwd`                         |
+| `sudo passwd username`         | Change another user’s password                                    | Root / sudo      | `sudo passwd alice`              |
+| `sudo passwd -l username`      | Lock the account (puts ! in front of the hash)                    | Root only        | `sudo passwd -l bob`             |
+| `sudo passwd -u username`      | Unlock the account                                                | Root only        | `sudo passwd -u bob`             |
+| `sudo passwd -d username`      | Delete the password (makes login passwordless – dangerous!)       | Root only        | `sudo passwd -d test`            |
+| `sudo passwd -e username`      | Expire the password (forces user to change it on next login)      | Root only        | `sudo passwd -e alice`           |
+| `sudo passwd -S username`      | Show password status (shows if locked, last change date, etc.)    | Root only        | `sudo passwd -S karking`         |
+| `passwd -S`                    | Show password status for your own account                         | Any user         | `passwd -S`                      |
+
+
