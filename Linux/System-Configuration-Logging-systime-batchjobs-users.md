@@ -153,7 +153,8 @@ Linux handles user accounts using a few key plaintext configuration files in `/e
     daemon:*:1:
     users:*:1000:alice,bob,carol
     ```
-### Special Users
+***Special Users***
+
 Special users (also called pseudo-users or system users) in Linux are accounts that do not correspond to real human beings. They exist so that system services, daemons, and files can run with specific, limited privileges instead of running everything as root.
 
 ***Typical special users in `/etc/passwd`***
@@ -163,7 +164,8 @@ Special users (also called pseudo-users or system users) in Linux are accounts t
 * bin (UID 2) — Owner of legacy binary directories (mostly historical)
 * man (UID 6) — Owns manual page files
 
-### passwd command
+
+***passwd command***
 
 ```bash
 # Basic Use
