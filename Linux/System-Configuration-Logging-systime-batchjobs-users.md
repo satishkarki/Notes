@@ -198,3 +198,47 @@ $ sudo passwd username
 | `passwd -S`                    | Show password status for your own account                         | Any user         | `passwd -S`                      |
 
 
+## Scheduling recurring task with cron
+
+Cron is the classic Linux tool for running commands or scripts automatically at fixed times, dates, or intervals — no need to be logged in. It is perfect for backups, log rotation, system cleanup, monitoring, reminders, or any repetitive admin task.
+
+***How Cron Works?***
+* A daemon called crond (cron daemon) wakes up every minute and checks all scheduled jobs.
+* Jobs are defined in crontab files (cron table).
+* There are two main types:
+    * User crontabs — per-user (you edit with `crontab -e`)
+    * System crontabs — usually in `/etc/crontab` or `/etc/cron.d/`, `/etc/cron.daily/`, etc. (managed by packages or root)
+
+***Syntax***
+```bash
+minute  hour  day-of-month  month  day-of-week   command-to-run
+```
+
+| Field          | Allowed values            | Special characters   | Meaning                              |
+|----------------|---------------------------|----------------------|--------------------------------------|
+| minute         | 0–59                      | * , - /              | Minute of the hour                   |
+| hour           | 0–23                      | * , - /              | Hour of the day (24-hour format)     |
+| day-of-month   | 1–31                      | * , - /              | Day of the month                     |
+| month          | 1–12 (or JAN–DEC)         | * , - /              | Month of the year                    |
+| day-of-week    | 0–7 (0 or 7 = Sunday)     | * , - /              | Day of the week                      |
+| command        | Any valid shell command   | (full path recommended) | What actually runs                |
+
+*What the special characters mean?*
+Special characters explained:
+
+* '*' = every possible value (e.g., * in minute = every minute)
+* ',' = list of values (e.g., 0,15,30,45 = at :00, :15, :30, :45)
+* '-' = range (e.g., 9-17 in hour = 9 AM to 5 PM)
+* '/' = step (e.g., */15 in minute = every 15 minutes)
+
+***How to edit and manage your cron tab***
+
+| Command                     | What it does                                      | Notes                                      |
+|-----------------------------|---------------------------------------------------|--------------------------------------------|
+| `crontab -e`                | Edit your personal crontab (safest way)           | Opens in your default editor (vim/nano)    |
+| `crontab -l`                | List (view) your current crontab                  | Just prints it                             |
+| `crontab -r`                | Remove (delete) your entire crontab               | Careful — no undo!                         |
+| `sudo crontab -e`           | Edit root's crontab                               | For system-wide jobs                       |
+| `crontab -u username -e`    | Edit another user's crontab (as root)             | Rare, but useful                           |
+
+## User Identification and Authentication
