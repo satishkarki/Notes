@@ -242,3 +242,104 @@ Special characters explained:
 | `crontab -u username -e`    | Edit another user's crontab (as root)             | Rare, but useful                           |
 
 ## User Identification and Authentication
+* You type username at the login prompt - Identification starts
+* System asks for password - Authentication via PAM (checks `/etc/shadow` using `pam_unix.so` or other modules) 
+* If successful - your shell starts with your real UID, and Authorization is enforced for every command/file access
+
+***Useful Commands***
+```bash
+# See your full identity
+$ id
+
+# Output
+uid=1000(butcher) gid=1000(butcher) groups=1000(butcher),4(adm),20(dialout),24(cdrom),25(floppy),27(sudo),29(audio),30(dip),44(video),46(plugdev),100(users),107(netdev)
+```
+
+```bash
+# Who is logged in right now (shows real vs effective if switched)
+
+$ whoami
+# Output : butcher
+
+$ who -u
+# Output : butcher  pts/1        2026-03-25 13:33 02:56         731
+```
+```bash
+# Check last logins (authentication history)
+$ last
+
+# Output
+reboot   system boot  6.6.87.2-microso Wed Mar 25 13:33   still running
+butcher  pts/5        tmux(415426).%0  Wed Mar 18 15:51 - 15:52  (00:00)
+butcher  pts/5        tmux(415293).%0  Wed Mar 18 15:51 - 15:51  (00:00)
+reboot   system boot  6.6.87.2-microso Mon Mar 16 15:37   still running
+reboot   system boot  6.6.87.2-microso Thu Mar 12 11:33   still running
+...
+...
+```
+```bash
+# See failed login attempts
+$ sudo lastb
+```
+### PAM- Pluggable Authentication Module
+It is a system of shared libraries for authentication. It is the middleman that lets Linux programs outsource user authentication to a flexible, stack-based system of plug-in modules.
+
+Because there are many kinds of authentication scenarios, PAM employs a number of dynamically loadable authentication modules. Each module performs a specific task; for example, the `pam_unix.so` module can check a user’s password.
+
+***Core Idea of PAM***
+1. Shared Libraries : PAM is a set of shared libraries (modules) located in `/lib/*/security/` or `/usr/lib/*/security/`
+
+    ```bash
+    # shared libraries
+    $ ls -F /lib/*/security
+
+    # Output
+    pam_access.so      pam_group.so      pam_permit.so      pam_systemd_loadkey.so
+    pam_cap.so         pam_issue.so      pam_pwhistory.so   pam_time.so
+    pam_debug.so       pam_keyinit.so    pam_rhosts.so      pam_timestamp.so
+    pam_deny.so        pam_limits.so     pam_rootok.so      pam_tty_audit.so
+    pam_echo.so        pam_listfile.so   pam_securetty.so   pam_umask.so
+    ...
+    ...
+    ```
+2. Configuration Files : Configuration files in `/etc/pam.d/` tell each service (login, sudo, sshd, etc.) which modules to use and in what order
+    ```bash
+    $ ls -F /etc/pam.d
+
+    # Output: 
+    chfn            common-auth                    cron      passwd     su-l
+    chpasswd        common-password                login     runuser    sudo
+    chsh            common-session                 newusers  runuser-l  sudo-i
+    common-account  common-session-noninteractive  other     su
+    ```
+3. PAM organizes authentication into four management groups (stacks)
+    * auth
+    * account
+    * password
+    * session
+
+***How a PAM Configuration File Looks***
+```bash
+type    control-flag    module-name    [arguments]
+```
+**Example** - typical /etc/pam.d/login (simplified)
+```bash
+% cat /etc/pam.d/login
+
+# Output
+auth       required     pam_securetty.so
+auth       include      system-auth
+account    required     pam_nologin.so
+account    include      system-auth
+password   include      system-auth
+session    include      system-auth
+session    optional     pam_motd.so
+```
+**Control Flag**
+* required = "must pass, but keep going"
+* requisite = "must pass right now or stop"
+* sufficient = "if this passes and nothing bad happened before, we're good"
+* optional = "nice to have, but not important"
+
+
+Next we will explore the process and resource utilization. Stay tuned..
