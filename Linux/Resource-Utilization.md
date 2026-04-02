@@ -120,3 +120,57 @@ sudo ltrace -p <PID>             # Attach to a running process (Ctrl+C to stop)
 ltrace -o trace.log <command>    # Save output to a file
 ```
 ## Threads
+* Process = Full program with its own memory, files, PID.
+* Thread = Lightweight "sub-process" inside a process.
+* Threads share the same memory, open files, and resources → faster and more efficient for concurrency.
+* Linux treats threads as processes that share resources (1:1 threading model).
+
+***How to See Threads***
+
+```bash
+$ htop # Press H to toggle threads on/off (easiest)
+$ ps -eLf or ps -o pid,tid,comm # Shows threads (same PID, different TID).
+$ top # Press H to show threads.
+$ /proc/<PID>/task/ # Each subdirectory = one thread.
+$ pstree -p -t <PID> # Tree view with threads.
+```
+***Tracing Threads***
+
+* Use strace -f and ltrace -f (the -f flag follows threads).
+* Common creation syscall: clone().
+
+## Resource Monitoring
+Use `uptime` for quick system health, `pidstat` / `top` for detailed CPU time, and `nice`/`renice` to control which processes get more (or less) CPU.
+
+
+### Memory Monitoring
+Linux uses virtual memory — every process thinks it has its own large, continuous block of memory, but the kernel maps this to physical RAM using the Memory Management Unit (MMU) and pages (usually 4KB chunks).
+
+* The kernel is aggressive about using all available RAM for caching and buffering to improve performance.
+* When processes need more memory, the kernel reclaims cache/buffers quickly.
+* If physical RAM runs low, the kernel starts swapping (moving less-used pages to disk/swap space) — this slows the system dramatically.
+
+***Tools***
+```bash
+free -h -s 2     # Refresh every 2 seconds (like a simple monitor)
+free -h -t       # Show a total line at the bottom
+vmstat 1 5       # Update every 1 second, show 5 lines
+vmstat 5 -S M    # Every 5 seconds, show in Megabyte
+```
+
+
+![vmstat](assets/Process-Utilization/vmstat.png)
+
+* Used — Memory currently held by processes (including shared libraries).
+* Free — Truly unused RAM (rarely high on a healthy system).
+* Buffers — Temporary storage for block devices (disk I/O).
+* Cache (page cache) — Cached file contents for faster reads/writes.
+* Swap — Disk space used as overflow when RAM is exhausted.
+* si — Swap in (KB/s) — pages being read from swap into RAM.
+* so — Swap out (KB/s) — pages being written to swap.
+
+### I/O Monitoring
+
+
+
+
