@@ -171,6 +171,60 @@ vmstat 5 -S M    # Every 5 seconds, show in Megabyte
 
 ### I/O Monitoring
 
+I/O (Input/Output) refers mainly to disk activity - reading from and writing to storage devices (HDDs, SSDs, NVMe).
+
+***iostat***
+
+![iostat](assets/Process-Utilization/iostat.png)
+
+Use cases:
+```bash
+iostat                  # Snapshot since boot (averages)
+iostat -p ALL           # -p shows partition info
+iostat 2 5              # Refresh every 2 seconds, 5 times
+iostat -x 2             # Extended statistics (most useful)
+iostat -d -x 2          # Disk only, extended
+```
+***Per-Process I/O Utilization and Monitoring: iotop***
+
+Shows which processes are reading/writing the most (DISK READ / DISK WRITE columns)
+
+![iotop](assets/Process-Utilization/iotop.png)
+
+* Kernel allows more I/O time for a process with priority be/3 than one with priority be/4
+
+    * `be` : Best effort. The kernel does its best to schedule I/O fairly for this class
+    * `rt` : Real time. The kernel schedules any real-time I/O before any other class of I/O, no matter what.
+    * `idle` : Idle. The kernel performs I/O for this class only when there is no other I/O to be done.
+
+Use cases:
+```bash
+# Basic live view
+iostat -x 2
+
+# Disk-only extended stats
+iostat -d -x 2 10
+
+# Watch a specific device
+iostat -x /dev/nvme0n1 2
+
+# Find the process causing heavy I/O
+sudo iotop -o          # -o shows only active processes
+```
+## Control Groups
+
+`cgroups` (control groups) is a Linux kernel feature that lets you organize processes into groups and limit, account for, and prioritize the resources they can use. 
+
+Containers (Docker, Podman, Kubernetes, LXC) rely heavily on cgroups for isolation and resource limits.
 
 
+![cgroups](assets/Process-Utilization/cgroup.png)
 
+***Useful Commands***
+
+```bash
+systemd-cgls                  # Tree view of all cgroups (easiest)
+cat /proc/<PID>/cgroup        # Which cgroup a process belongs to
+systemd-run --scope -p MemoryMax=500M <command>   # Quick limit
+```
+Now we know how to inspect processes, understand what they’re doing under the hood, and monitor/control CPU, memory, and I/O resources like a superuser. We will move on to the topic of network and its configuration in Linux.
