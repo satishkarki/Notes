@@ -77,7 +77,6 @@ Common Combinations:
 ***1. ICMP*** (Internet Control Message Protocol) is a supporting protocol in the Internet Layer. It is used for error reporting, diagnostics, and simple queries. It does not carry user data like TCP or UDP.
 
 The most common ICMP message type is Echo Request / Echo Reply — this is what `ping` uses.
-
 ```bash
 ping 8.8.8.8          # Test connectivity to Google DNS by IP
 ping google.com       # Test by hostname (uses DNS first)
@@ -110,5 +109,43 @@ dig google.com          # Full detailed output
 dig +short google.com   # Short answer only
 ```
 ![dig](assets/Network-Config/dig.png)
+
+## Kernel Network Interface
+The kernel network interface is the "door" the kernel uses to send and receive packets to/from the hardware. Each interface has a name (e.g., eth0, enp0s3, wlan0, docker0, lo for loopback).
+
+1. The Old Tool: `ifconfig`
+
+   ```bash
+    ifconfig                  # Show only UP (active) interfaces
+    ifconfig -a               # Show ALL interfaces (including down ones) 
+
+    # Bringing interface up/down
+    sudo ifconfig eth0 up
+    sudo ifconfig eth0 down
+    ```
+
+2. Modern Replacement: `ip link` and `ip addr`
+    ```bash
+    ip link show              # Show interface status and link-layer info (like ifconfig -a)
+    ip addr show              # Show IP addresses + interface status (most useful)
+    ip addr show eth0         # Show only one interface
+
+    # Bring interface up/down
+    sudo ip link set eth0 up
+    sudo ip link set eth0 down 
+    ```
+3. Low-Level Hardware Info - `ethtool`
+    ```bash
+    sudo ethtool eth0                  # Basic info: speed, duplex, link status
+    sudo ethtool -i eth0               # Driver information (which kernel module is used)
+    sudo ethtool -S eth0               # Detailed statistics (errors, drops, etc.)
+    sudo ethtool -k eth0               # Show offload features (checksum offloading, etc.)
+    ```
+    ![ethtool](assets/Network-Config/ethtool.png)
+
+
+
+
+
 
 
