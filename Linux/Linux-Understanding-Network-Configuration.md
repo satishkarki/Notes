@@ -143,8 +143,25 @@ The kernel network interface is the "door" the kernel uses to send and receive p
     ```
     ![ethtool](assets/Network-Config/ethtool.png)
 
+More about network manager [here](https://satishkarki.com/posts/Network-Manager-CLI/)
+
+## Resolving hostnames
+
+| Component          | Purpose                                              | Key File / Tool                          |
+|--------------------|------------------------------------------------------|------------------------------------------|
+| **/etc/hosts**     | Static local mappings (checked first)                | `/etc/hosts`                             |
+| **DNS Servers**    | Remote lookup (real internet/hostnames)              | `/etc/resolv.conf`                       |
+| **nsswitch**       | Controls lookup **order**                            | `/etc/nsswitch.conf`                     |
+| **Local Resolver** | Caching, systemd-resolved, mDNS (.local names)       | `resolvectl`, `systemd-resolved`         |
 
 
+***Resolving flow***
+1. Type ping google.com
+2. System checks /etc/hosts first
+3. If not found → queries DNS servers listed in /etc/resolv.conf
+4. Result is cached locally for speed
+
+## The Transport Layer: TCP, UDP, and Services
 
 
 
