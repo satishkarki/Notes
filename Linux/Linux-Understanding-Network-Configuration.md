@@ -53,8 +53,8 @@ $ ip route # Modern Linux Commnd
 
 Example:
 
-* Destination: 192.168.1.50 → matches the /24 route → send directly via enp0s3.
-* Destination: 8.8.8.8 (Google DNS) → doesn’t match the /24 → falls back to the default route → send to 192.168.1.1
+* Destination: 10.0.0.50 → matches the /24 route → send directly via wlp59s0.
+* Destination: 8.8.8.8 (Google DNS) → doesn’t match the /24 → falls back to the default route → send to 10.0.0.1
 
 
 ***Flags***
@@ -163,6 +163,228 @@ More about network manager [here](https://satishkarki.com/posts/Network-Manager-
 
 ## The Transport Layer: TCP, UDP, and Services
 
+Let's look at port first. They are like apartment numbers in a building. The building is your computer (IP address), and each apartment is a different service waiting for visitors.
+
+```bash
+┌─────────────────────────────────────────────────────────────┐
+│  PORT RANGES                                                │
+│                                                             │
+│  0 - 1023      ← Well-Known Ports (need root to use)        │
+│                   SSH:22, HTTP:80, HTTPS:443, DNS:53        │
+│                                                             │
+│  1024 - 49151  ← Registered Ports                           │
+│                   MySQL:3306, PostgreSQL:5432, Redis:6379   │
+│                                                             │
+│  49152 - 65535 ← Ephemeral/Dynamic Ports                    │
+│                   Assigned automatically to clients         │
+└─────────────────────────────────────────────────────────────┘
+```
+Now lets look at an overview of the TCP connection:
+
+```bash
+CLIENT                              SERVER
+  │                                   │
+  │──── SYN ─────────────────────────►│  "Hey, can you hear me?"
+  │                                   │
+  │◄─── SYN-ACK ──────────────────────│  "Yes! Can you hear ME?"
+  │                                   │
+  │──── ACK ─────────────────────────►│  "Yes! Let's talk."
+  │                                   │
+  │════════ DATA FLOWS ═══════════════│
+  │                                   │
+  │──── FIN ─────────────────────────►│  "I'm done talking."
+  │◄─── FIN-ACK ──────────────────────│  "OK, goodbye."
+```
 
 
+ Now that we looked at port and TCP, here is how a unique connection works:
+ ```bash
+ Source IP : Source Port  →  Destination IP : Destination Port
 
+Example:
+192.168.1.5:54321  →  93.184.216.119:80
+
+This is ONE unique connection.
+ ```
+This is why our computer can have thousands of simultaneous connections to the same website — each connection gets a different source port (ephemeral port).
+
+```bash
+Your Computer (192.168.1.5)
+├── :54321 → google.com:80    (Tab 1)
+├── :54322 → google.com:80    (Tab 2)
+├── :54323 → google.com:80    (Tab 3)
+└── :54324 → google.com:443   (Tab 4 - HTTPS)
+```
+***Examples and Commands***
+1. Viewing Active Connections with netstat
+    ```bash
+    # Show all TCP connections
+    netstat -nt
+
+    # Show all listening ports
+    netstat -ntl
+
+    # Show both TCP and UDP
+    netstat -ntul
+
+    # Show with process names (need sudo for other users' processes)
+    sudo netstat -ntulp
+    ```
+2. The modern replacement: ss (Socket Statistics)
+
+    `ss` is faster and more powerful than `netstat`
+    ```bash
+    # Show all TCP connections
+    ss -t
+
+    # Show listening ports only
+    ss -tl
+
+    # Show with process info
+    sudo ss -tlp
+
+    # Show all states with more detail
+    ss -tan
+
+    # Show UDP
+    ss -ul
+
+    # Filter by port
+    ss -t '( dport = :80 or sport = :80 )'
+
+    # Filter by state
+    ss -t state established
+    ss -t state time-wait
+    ss -t state listening
+    ```
+    ![netstat vs ss](assets/Network-Config/netstat-ss.png)
+
+
+## Understanding DHCP
+
+```bash
+CLIENT                                    DHCP SERVER
+  │                                            │
+  │                                            │
+  │  ①DISCOVER                                │
+  │  "Is anyone out there?                     │
+  │   I need an IP address!"                   │
+  │  (broadcast to 255.255.255.255)            │
+  │─────────────────────────────────────────►  │
+  │                                            │
+  │                          ②OFFER           │
+  │                     "I'm here!             │
+  │                      How about             │
+  │                      192.168.1.45?"        │
+  │◄─────────────────────────────────────────  │
+  │                                            │
+  │  ③REQUEST                                 │
+  │  "Yes please! I'd like                     │
+  │   192.168.1.45"                            │
+  │  (still broadcast - others may have        │
+  │   offered too)                             │
+  │─────────────────────────────────────────►  │
+  │                                            │
+  │                          ④ACKNOWLEDGE     │
+  │                     "It's yours!           │
+  │                      Lease: 24 hours"      │
+  │◄─────────────────────────────────────────  │
+  │                                            │
+  │  Device is now configured!                 │
+  ```
+  * DHCP uses UDP port 67 (server) and 68 (Client)- not TCP
+
+What DHCP sends you ? - The Full Package
+```bash
+DHCP Lease Contains:
+┌─────────────────────────────────────────────────────────┐
+│  REQUIRED                                               │
+│  ├── IP Address          (e.g., 192.168.1.45)           │
+│  ├── Subnet Mask         (e.g., 255.255.255.0)          │
+│  └── Lease Duration      (e.g., 86400 seconds)          │
+│                                                         │
+│  COMMON OPTIONAL                                        │
+│  ├── Default Gateway     (e.g., 192.168.1.1)            │
+│  ├── DNS Server(s)       (e.g., 8.8.8.8, 8.8.4.4)       │
+│  ├── Domain Name         (e.g., home.local)             │
+│  ├── NTP Server          (time server)                  │
+│  └── TFTP Server         (for network booting)          │
+│                                                         │
+│  ADVANCED (enterprise)                                  │
+│  ├── WINS Server         (Windows name resolution)      │
+│  ├── Static Routes       (extra routing info)           │
+│  └── Vendor Options      (custom data)                  │
+└─────────────────────────────────────────────────────────┘
+```
+
+Setting up a Simple DHCP server on Linux
+```bash
+# Install ISC DHCP server
+sudo apt install isc-dhcp-server      # Ubuntu/Debian
+sudo dnf install dhcp-server          # Fedora/RHEL
+```
+
+Basic configuration `/etc/dhcp/dhcpd.conf`
+```bash
+# Global settings
+default-lease-time 86400;        # 24 hours
+max-lease-time 172800;           # 48 hours max
+
+# The subnet this server manages
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    
+    # IP range to hand out
+    range 192.168.1.100 192.168.1.200;
+    
+    # Options sent to clients
+    option routers 192.168.1.1;
+    option domain-name-servers 8.8.8.8, 8.8.4.4;
+    option domain-name "home.local";
+    option subnet-mask 255.255.255.0;
+    option broadcast-address 192.168.1.255;
+}
+
+# DHCP Reservation - always give printer same IP
+host myprinter {
+    hardware ethernet aa:bb:cc:dd:ee:ff;   # MAC address
+    fixed-address 192.168.1.50;             # Always this IP
+}
+```
+```bash
+# Start the server
+sudo systemctl start isc-dhcp-server
+sudo systemctl enable isc-dhcp-server
+
+# Check it's running
+sudo systemctl status isc-dhcp-server
+```
+## Configuring Linux as a Router
+Three things need to be true to enable Linux as router:
+1. At least two interface
+2. IP forwarding enabled
+3. Routing table has correct entries
+
+```bash
+# PACKET JOURNEY THROUGH A LINUX ROUTER:
+
+Step 1: Packet arrives on eth0
+        Source:      192.168.1.45  (your laptop)
+        Destination: 8.8.8.8       (Google DNS)
+              │
+              ▼
+Step 2: Kernel checks: "Is 8.8.8.8 meant for ME?"
+        → No, my addresses are 192.168.1.1 and 203.0.113.1
+              │
+              ▼
+Step 3: ip_forward = 0?  → DROP packet (default behavior)
+        ip_forward = 1?  → FORWARD packet (router behavior)
+              │
+              ▼
+Step 4: Kernel consults routing table
+        "Where do I send packets for 8.8.8.8?"
+        → Default route: send via eth1
+              │
+              ▼
+Step 5: Packet goes out eth1
+        Toward the internet!
+```
