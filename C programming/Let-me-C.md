@@ -16,9 +16,109 @@ $gcc helloworld.c -o helloworld && ./helloworld
 ```
 As soon as I compiled it, it threw an error.
 
-![error](/media/First-Error.png)
+![error](media/First-Error.png)
+
+It turns out older C standards (K&R C /C89) allowed implicit init, meaning a function with no return type was assumed to return init. GCC now warns about this(and newer standards like C99/C11 removed it entirely).
+
+```bash
+$gcc -std=c89 helloworld.c -o helloworld
+```
+Choosing the C89 standard allowed me to run the code. But the right fix is adding init and it is the correct modern way.
+
+```c
+#include <stdio.h>
+int main()  // ✅
+{
+    printf("Hello, World!\n");
+    return 0;
+}
+```
+OR
+```c
+#include <stdio.h>
+int main(void)
+{
+    printf("Hello, World!\n");
+    return 0;
+}
+```
 
 
+## Under the hood
+
+There are three layers to it:
+
+```bash
+─────────────────────────────────────────
+  YOUR CODE  (helloworld.c)
+  #include <stdio.h>
+─────────────────────────────────────────
+        │ uses declarations from
+        ▼
+─────────────────────────────────────────
+  HEADER FILES  (/usr/include/stdio.h)
+  Just function signatures & macros
+  Written by glibc developers
+─────────────────────────────────────────
+        │ actual code lives in
+        ▼
+─────────────────────────────────────────
+  GLIBC  (/usr/lib64/libc.so.6)
+  The real compiled implementation
+  of printf, scanf, malloc, etc.
+─────────────────────────────────────────
+        │ talks to
+        ▼
+─────────────────────────────────────────
+  LINUX KERNEL
+  Does the real I/O, memory, etc.
+─────────────────────────────────────────
+```
+
+***The C Standard Library***
+
+It is a collection of pre-written functions that come bundled with your C compiler. Instead of writing everything from scratch, you can use these ready-made functions for common tasks like input/output, math, string manipulation, memory management, etc.
+
+> #include is a preprocessor directive- it tells compiler -"before compiling, copy the content of this file into my code"
+
+
+![standard library](media/standrd-library.png)
+
+Here is a snippet of the `stdio.h` file:
+![stdio](media/stdio.png)
+
+***glibc = GNU C Library***
+
+It is the actual implementation of the C standard library made by the GNU project. It's the engine behind all those functions you use.
+
+![GNU libc](media/libc-so.png)
+
+> What is a symbol table? - When C source code gets compiled into a binary (.so file), the human-readable function names don't disappear completely — they leave behind symbols so the system can find and link them at runtime.
+
+What we are seeing is:
+```bash
+000000000001b110 T a64l
+│                │  │
+│                │  └── Function name (symbol)
+│                └── Symbol type
+└── Memory address (where it lives in the file)
+```
+When the program calls `printf`:
+```bash
+Our code says "call printf"
+        │
+        ▼
+Linux loader opens /usr/lib64/libc.so.6
+        │
+        ▼
+Looks up "printf" in the symbol table
+        │
+        ▼
+Finds its memory address
+        │
+        ▼
+Jumps to that address and executes the code
+```
 
 
 
