@@ -80,3 +80,112 @@ Character Constant
 ```c
 char c = 'A';   // 'A' is really just the integer 65 (in ASCII)
 ```
+
+| Escape Sequence | Meaning |
+|------------------|---------|
+| `\a` | Alert (bell) character |
+| `\b` | Backspace |
+| `\f` | Formfeed |
+| `\n` | Newline |
+| `\r` | Carriage return |
+| `\t` | Horizontal tab |
+| `\v` | Vertical tab |
+| `\\` | Backslash |
+| `\?` | Question mark |
+| `\'` | Single quote |
+| `\"` | Double quote |
+| `\ooo` | Octal number (1 to 3 digits: 0-7) |
+| `\xhh` | Hexadecimal number (one or more digits) |
+
+**Enumeration**
+
+It is a way to declare a list of named integers constants.
+
+```c
+/* Automatic values starting from 0 */
+enum boolean { NO, YES };
+
+/* Explicit values */
+enum escapes { 
+    BELL = '\a', 
+    BACKSPACE = '\b', 
+    TAB = '\t', 
+    NEWLINE = '\n' 
+};
+
+/* Starting from 1 */
+enum months { JAN = 1, FEB, MAR, APR, MAY, JUN,
+              JUL, AUG, SEP, OCT, NOV, DEC };
+```
+
+Here is a gotcha:
+```c
+enum colors { RED, GREEN = 5, BLUE };
+```
+> Note: Value of Red is 0, Green is % and Blue is 6
+
+Use case:
+```c
+#include <stdio.h>
+
+/* Declare an enumeration for days of the week.
+   SUN starts at 0 by default, and each subsequent
+   name auto-increments by 1. */
+enum weekday { SUN, MON, TUE, WED, THU, FRI, SAT };
+
+int main(void)
+{
+    enum weekday today;   // declare a variable of type "enum weekday"
+
+    today = WED;          // assign it one of the enum constants
+
+    printf("Today's numeric value is: %d\n", today);
+
+    if (today == SAT || today == SUN)
+        printf("It's the weekend!\n");
+    else
+        printf("It's a weekday.\n");
+
+    return 0;
+}
+```
+```bash
+# Output
+Today's numeric value is: 3
+It's a weekday.
+```
+
+## Type Conversion
+
+In C's usual arithmetic conversions, when two operands of different types are used in an expression, the "lower" type gets converted up to the "higher" type before the operation happens — conversion works its way up this ladder.
+
+| Priority | Type |
+|----------|------|
+| 1 (highest) | `long double` |
+| 2 | `double` |
+| 3 | `float` |
+| 4 | `unsigned long` |
+| 5 | `long` |
+| 6 | `unsigned int` |
+| 7 (lowest) | `int` |
+
+**Explicit Conversion : The Cast Operator**
+
+Let's look at this example:
+```c
+int sum = 7;
+int count = 2;
+
+float average = sum / count;   // What do you expect this to print?
+```
+Even though average is a float, the expression sum / count is computed entirely in integer arithmetic first (since both operands are int), and integer division truncates any fractional part. So sum / count evaluates to 3 (not 3.5), and then that 3 gets converted to 3.0 when stored into average. The fractional information is already lost by the time the float conversion happens.
+
+> The Fix:
+
+```c
+float average = (float) sum / count;
+```
+Here, (float) sum explicitly converts sum to a float first. Now, since one operand of / is a float, the usual arithmetic conversion rule kicks in and promotes count to float as well — so the division itself happens in floating-point, giving 3.5, and that is what's stored in average.
+
+
+
