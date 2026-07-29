@@ -17,7 +17,7 @@ On the other hand, Docker Desktop creates a small Linux virtual machine. That VM
 Lets briefly tocuh on KVM and QEMU before diving into Docker Desktop installtion. 
 QEMU as the name suggest- Quick Emulator creates virtual machine model- motherboard, firmware, disks, network cards, display, USB ect. It can even emulate the CPU. But the software emulated CPU can be slow- thats where the KVM comes in. Kernal-based Virtual Machine turns Linux kernel into a hardware assisted hypervisor.  It lets normal guest CPU instrcutions run directly on the host CPU. 
 
-![KVM QEMU](docker/image-resource/kvm-qemu.png)
+![KVM QEMU](/image-resource/kvm-qemu.png)
 
 
 ## Installation
