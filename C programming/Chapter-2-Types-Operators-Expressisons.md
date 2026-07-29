@@ -187,5 +187,31 @@ float average = (float) sum / count;
 ```
 Here, (float) sum explicitly converts sum to a float first. Now, since one operand of / is a float, the usual arithmetic conversion rule kicks in and promotes count to float as well — so the division itself happens in floating-point, giving 3.5, and that is what's stored in average.
 
+## Increment and Decrement Operators
+
+* ++n or --n (Prefix) Change happens before the value is used
+* n++ or n--(Postfix) Change happens after the value is used
+
+```c
+#include <stdio.h>
+
+main() {
+    int n = 5;
+
+    printf("n++   = %d\n", n++);   /* prints 5, then n becomes 6 */
+    printf("++n   = %d\n", ++n);   /* n becomes 7, then prints 7 */
+    printf("n     = %d\n", n);     /* final value of n */
+}
+```
+## Bitwise Operator
+
+| Operator | Name |
+|----------|------|
+| `&` | bitwise AND |
+| `\|` | bitwise OR |
+| `^` | bitwise XOR (exclusive or) |
+| `<<` | left shift |
+| `>>` | right shift |
+| `~` | one's complement (bitwise NOT) |
 
 
