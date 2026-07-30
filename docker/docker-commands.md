@@ -2,7 +2,7 @@
 
 > It works on my machine !!!
 
-I am using Fedora so I am following [installtion on Linux](https://docs.docker.com/desktop/setup/install/linux/) guide for Docker Desktop.
+I am using Fedora VM so I am following [installtion on Linux](https://docs.docker.com/desktop/setup/install/linux/) guide for Docker Desktop.
 
 Under general requirement, it says Docker desktop depends on KVM virtualization and QEMU. What does it mean?
 
@@ -17,7 +17,7 @@ On the other hand, Docker Desktop creates a small Linux virtual machine. That VM
 Lets briefly tocuh on KVM and QEMU before diving into Docker Desktop installtion. 
 QEMU as the name suggest- Quick Emulator creates virtual machine model- motherboard, firmware, disks, network cards, display, USB ect. It can even emulate the CPU. But the software emulated CPU can be slow- thats where the KVM comes in. Kernal-based Virtual Machine turns Linux kernel into a hardware assisted hypervisor.  It lets normal guest CPU instrcutions run directly on the host CPU. 
 
-![KVM QEMU](/Notes/docker/image-resource/kvm-qemu.png)
+![KVM QEMU](image-resource/kvm-qemu.png)
 
 
 
@@ -59,4 +59,57 @@ M3 Mac
             ├── Container A
             └── Container B
 ```
+
+I am going to put a hold on this thought for now. Let's pivot to installing Docker Desktop for MacBook. We will revisit the docker engine after gaining familiarity with the Docker Desktop.
+
+### Installation on MacBook
+
+Download link [Apple Silicon](https://desktop.docker.com/mac/main/arm64/Docker.dmg?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-mac-arm64)
+
+
+**Running first container**
+```bash
+docker run -d -p 8080:80 docker/welcome-to-docker
+```
+![First Container](image-resource/first-container.png)
+
+And here is how it looks:
+```bash
+http://localhost:8080
+```
+
+![Congrats](image-resource/congrats.png)
+
+> What is happening behind the scene? 
+
+* docker run — Creates and starts a new container.
+* -d — Runs the container in detached mode, meaning it stays in the background.
+* -p 8080:80 — Maps port 8080 on your computer to port 80 inside the container.
+* docker/welcome-to-docker — The Docker image used to create the container.
+
+Useful follow-up commands:
+```bash
+docker ps # See the running container
+docker logs <container-id> # View its logs
+docker stop <container-id> # Stop Container
+docker rm <container-id> # Remove the stopped Container
+docker run -d --name welcome-app -p 8080:80 docker/welcome-to-docker # You can also give it a friendly name
+
+docker stop welcome-app # manage it using the name
+docker rm welcome-app # manage it using the name
+
+docker run -d -p 8081:80 docker/welcome-to-docker # If port 8080 is already being used, change the first port number
+```
+
+```bash
+docker start <container-id> # To start stopped container
+docker rename <container-id> <new-name> # To rename already running container
+```
+
+```bash
+docker images # To see locally downlaoded images
+docker image inspect docker/welcome-to-docker # To see the full registry and repository information
+```
+
+## Develop with Containers
 
