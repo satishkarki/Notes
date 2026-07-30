@@ -113,3 +113,41 @@ docker image inspect docker/welcome-to-docker # To see the full registry and rep
 
 ## Develop with Containers
 
+Resource [link](https://docs.docker.com/get-started/introduction/develop-with-containers/)
+
+```bash
+git clone https://github.com/docker/getting-started-todo-app # Downlaod the project
+cd getting-started-todo-app 
+```
+
+```bash
+docker compose watch
+```
+Wow, what just happened? I am blown away. The things going on behind the scene is insane, I will definitely revisit it later but for now let's cut the noise and highlight key things that happened.
+
+Lets start with the project file. Here is the snippet:
+
+![code file](image-resource/code-file.png)
+
+And here is the snippet from terminal
+
+![terminal-command](image-resource/terminal-output.png)
+
+>What is happening?
+* It appears, Docker reads compose.yaml file. That file describes the complete application environment- not just one container.
+* Docker download these images from Docker Hub when they are not already available locally (as in terminal snippet above)
+* Application images are built locally - The frontend and backend are built from the project’s Dockerfile (Confusing, I will revisit this later)
+* Compose creates a private Docker network so containers can communicate using their service names. Meaning- In the below screenshot, we can see the app is made up of five containers and they need to communicate with each other.
+![multiple-container](image-resource/multi-container.png)
+ 
+
+```bash
+docker compose down # Remove the container and network
+
+docker compose down --volumes # To explicitly remove the volumes for e.g MySQL
+```
+![docker-down](image-resource/docker-down.png)
+
+Now that we are a little bit familiar with the development process. We will get our feet wet by moving on to Build and push process.
+
+## Build and push your first image
