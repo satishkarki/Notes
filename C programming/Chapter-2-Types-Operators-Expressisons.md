@@ -215,3 +215,64 @@ main() {
 | `~` | one's complement (bitwise NOT) |
 
 
+## Assignment Operator
+
+| Operator | Meaning |
+|----------|---------|
+| `+=` | `x = x + y` |
+| `-=` | `x = x - y` |
+| `*=` | `x = x * y` |
+| `/=` | `x = x / y` |
+| `%=` | `x = x % y` |
+| `<<=` | `x = x << y` |
+| `>>=` | `x = x >> y` |
+| `&=` | `x = x & y` |
+| `^=` | `x = x ^ y` |
+| `\|=` | `x = x \| y` |
+
+## Conditional Operator
+
+```c
+/* Ternary Operator */
+
+expr1 ? expr2 : expr3
+```
+How it works: expr1 is evaluated first as a condition. If it's true (nonzero), the whole expression evaluates to expr2. If it's false (zero), the whole expression evaluates to expr3. Only one of expr2 or expr3 is ever actually evaluated - not both.
+
+**Without conditional Operator**
+```c
+int a = 10, b;
+
+if (a >= 0)
+    b = a;
+else
+    b = -a;
+```
+**With Conditional Operator**
+```c
+int b = (a >= 0) ? a : -a;
+```
+## Precedence and Order of Evaluation
+
+> When in doubt use paranthesis.
+
+| Operators | Associativity |
+|-----------|----------------|
+| `() [] -> .` | left to right |
+| `! ~ ++ -- + - * (type) sizeof` (unary) | right to left |
+| `* / %` | left to right |
+| `+ -` | left to right |
+| `<< >>` | left to right |
+| `< <= > >=` | left to right |
+| `== !=` | left to right |
+| `&` | left to right |
+| `^` | left to right |
+| `\|` | left to right |
+| `&&` | left to right |
+| `\|\|` | left to right |
+| `?:` | right to left |
+| `= += -= *= /= %= &= ^= \|= <<= >>=` | right to left |
+| `,` (comma operator) | left to right |
+
+
+# Control Flow
