@@ -1,5 +1,5 @@
-# Types, Operators, and Expressions
-
+# Types, Operators, Expressions and Control Flow
+![control-flow](media/control_flow_bullet_thumbnail.svg)
 ## Variable names
 The conventions (not enforced, but expected)
 * Underscore-leading names are conventionally avoided in your own code. Names starting with `_` are often used by library implementations for internal names (like `_iob` in old standard library headers).
@@ -276,3 +276,110 @@ int b = (a >= 0) ? a : -a;
 
 
 # Control Flow
+
+## 1. If-Else
+```c
+if (expression)
+    statement1
+else
+    statement2
+```
+## 2. Else-If
+```c
+if (expression1)
+    statement1
+else if (expression2)
+    statement2
+else if (expression3)
+    statement3
+else
+    statement4
+```
+## 3. Swtich
+```c
+switch (expression) {
+    case const1:
+        statements
+        break;
+    case const2:
+        statements
+        break;
+    default:
+        statements
+}
+```
+## 4. Loops- While and For
+```c
+initialization;
+while (condition) {
+    statement
+    increment;
+}
+```
+```c
+for (initialization; condition; increment)
+    statement
+```
+Example:
+```c
+int count = 0;
+
+while (count < 5) {
+    printf("%d\n", count);
+    count++;
+}
+```
+```c
+for (int count = 0; count < 5; count++) {
+    printf("%d\n", count);
+}
+```
+## 5. Loop- Do-while
+
+```c
+do
+    statement
+while (expression);
+```
+Notice the `;` at the end this time - unlike while and for, the do-while loop is terminated with a semicolon, since the loop effectively ends on the while (expression) line.
+
+The key difference: with while and for, the condition is checked before the body runs - so the body might execute zero times. With do-while, the condition is checked after the body runs - so the body always executes at least once, no matter what.
+
+## 6. Break and Continue
+
+```c
+for (int i = 0; i < 10; i++) {
+    if (i == 5)
+        break;          // exit the loop entirely
+    printf("%d\n", i);
+}
+// prints 0 1 2 3 4, then stops completely
+```
+```c
+for (int i = 0; i < 5; i++) {
+    if (i == 2)
+        continue;       // skip printing for i == 2, but keep looping
+    printf("%d\n", i);
+}
+// prints 0 1 3 4  (2 is skipped, loop still runs to completion)
+```
+## 7. Goto and Labels
+```c
+goto label;
+...
+label: statement
+```
+Example:
+```c
+int i = 0;
+
+loop:
+    if (i >= 5)
+        goto done;
+    printf("%d\n", i);
+    i++;
+    goto loop;
+
+done:
+    printf("finished\n");
+```
