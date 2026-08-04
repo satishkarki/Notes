@@ -122,6 +122,8 @@ cd getting-started-todo-app
 
 ```bash
 docker compose watch
+
+docker compose stop # to stop
 ```
 Wow, what just happened? I am blown away. The things going on behind the scene is insane, I will definitely revisit it later but for now let's cut the noise and highlight key things that happened.
 
