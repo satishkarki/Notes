@@ -151,3 +151,82 @@ docker compose down --volumes # To explicitly remove the volumes for e.g MySQL
 Now that we are a little bit familiar with the development process. We will get our feet wet by moving on to Build and push process.
 
 ## Build and push your first image
+
+Before proceeding, let's clarify the confusion between container and image.
+```shell
+Dockerfile
+    |
+    | docker build
+    v
+Docker Image
+    |
+    | docker run
+    v
+Container
+```
+```shell
+docker run -d -p 8080:80 docker/welcome-to-docker
+```
+Here:
+
+* docker/welcome-to-docker = image
+* running welcome website = container
+
+> How do you define container? 
+
+A running, isolated environment that contains an application and everything the application needs to run.
+```bash
+Container has
+├── Application code
+├── Runtime
+├── Libraries
+├── Configuration
+├── Internal filesystem
+└── Startup process
+```
+Let's get back to the topic:
+
+If you already don't have the account for Docker, please create one. I am using the same account I used for Docker hub and it is working fine.
+
+Here is the link to [Docker Home](https://app.docker.com)
+
+### Creating an image repository
+![docker-repo](image-resource/docker-repo.png)
+
+Here is how my repo looks like fater signing in and creating the repo.
+* Go to Docker Hub.
+* Select Create repository.
+* On the Create repository page, enter the following information:
+    * Repository name - getting-started-todo-app
+    * Short description - feel free to enter a description if you'd like
+    * Visibility - select Public to allow others to pull your customized to-do app
+
+### Build and Push the image using CLI
+```bash
+git clone https://github.com/docker/getting-started-todo-app
+
+cd getting-started-todo-app
+```
+```bash
+docker build -t <DOCKER_USERNAME>/getting-started-todo-app . # t stands for tag, implicitly "latest" tag is attached 
+
+# Lets say I want to version it then the command will look something like this
+docker build -t satishkarki/getting-started-todo-app:v1 .
+```
+```bash
+docker image ls # To verify the image exists locally
+
+docker push <DOCKER_USERNAME>/getting-started-todo-app
+```
+The command here looks similar to how we work with the git. I love it. Kudos to who ever thought of it.
+
+> One thing to notice here is that this example repository already includes docker file. It is a text-based script that provides the instruction set on how to build the image.
+
+![docker-push](image-resource/docker-push.png)
+
+> Build and push process using the VS Code Extension is [here](https://docs.docker.com/get-started/introduction/build-and-push-first-image/) 
+
+
+Now that we have gone through the quick rundown of how the docker works and how it helps solve the problem of "It works on my machine" problem. Next we will look into the nitty gritty of the technical details including the docker file and compose.yml
+
+Stay tuned!!!
