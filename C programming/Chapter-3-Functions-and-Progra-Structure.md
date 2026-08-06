@@ -209,7 +209,234 @@ int main(void)
     Here `static` means something almost opposite: instead of persistence, it's about hiding something from other files. Normally, external variables/functions are visible to any file that `extern`-declares them. Marking one `static` at file scope makes it private to that `.c` file only — no other file can link to it, even with `extern`.
 
 ## Register Variables
+`register` is a storage class, just like `static` and `extern`, but its purpose is different: it's a hint to the compiler that a variable will be used very heavily (e.g., a loop counter accessed thousands of times), so it should - if possible - be kept in a CPU register instead of regular memory, for faster access.
 
+```c
+int sum_squares(int n)
+{
+    register int i;      // hint: keep 'i' in a fast CPU register
+    int total = 0;
+
+    for (i = 1; i <= n; i++) {
+        total += i * i;
+    }
+    return total;
+}
+```
+Only automatic variables (and function parameters) can be declared register - it makes no sense for external/static variables, since those need a fixed, addressable memory location anyway.
+
+>register is considered largely a historical/legacy keyword in modern C
+
+## Block Structure
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    int x = 1;                 // outer block: x = 1
+
+    if (x > 0) {
+        int x = 2;              // inner block: NEW x, shadows outer x
+        printf("Inner x = %d\n", x);   // prints 2
+    }
+
+    printf("Outer x = %d\n", x);       // prints 1 - untouched!
+    return 0;
+}
+```
+> C does not allow nested function definitions
+
+The inner `x` is a completely separate variable from the outer `x` - same name, different storage, different scope. Once the if block ends, the inner `x` is gone, and `x` reverts to referring to the outer one, exactly as if the inner block never happened.
+
+## Initialization
+
+* Rule 1: External and static variables default to zero
+    ```
+    int global_count;         // external, no initializer -> automatically 0
+    static int cache_size;    // static, no initializer -> automatically 0
+    ```
+    This happens because external/static storage is set up once, before main() even runs, and the C runtime guarantees that memory starts zeroed out.
+
+* Rule 2: Automatic and register variables have NO default value - they contain garbage.
+    ```c
+    void demo(void)
+    {
+        int x;              // automatic, uninitialized -> UNDEFINED, garbage value
+        printf("%d\n", x);   // could print anything - reads whatever bits were left in memory
+    }
+    ```
+    Automatic storage is just reused stack memory from whatever ran before - the compiler makes zero promises about its contents.
+
+> C's silent "zero for globals, garbage for locals" behavior is a common source of bugs for people coming from higher-level languages, so it's worth internalizing this rule carefully.
+
+
+## Recursion
+
+Recursion is a function solving a problem by calling itself on a smaller version of the same problem, until it hits a base case simple enough to answer directly without recursing further.
+
+```c
+#include <stdio.h>
+
+int factorial(int n)
+{
+    if (n <= 1) {          // base case: stops the recursion
+        return 1;
+    }
+    return n * factorial(n - 1);   // recursive case: smaller subproblem
+}
+
+int main(void)
+{
+    printf("5! = %d\n", factorial(5));
+    return 0;
+}
+```
+Let's trace it mentally:
+```shell
+factorial(5) = 5 * factorial(4)
+factorial(4) = 4 * factorial(3)
+factorial(3) = 3 * factorial(2)
+factorial(2) = 2 * factorial(1)
+factorial(1) = 1              <- base case reached, unwinding begins
+```
+Each call is suspended, waiting on the result of the next, until `factorial(1)` returns `1`, and then the multiplications happen in reverse order as the stack unwinds: `1 -> 2*1=2 -> 3*2=6 -> 4*6=24 -> 5*24=120`.
+
+# The C Preprocessor
+
+## File Inclusion
+```c
+#include <stdio.h>   // preprocessor pastes in the full contents of stdio.h here
+#include "helper.h"  // preprocessor pastes in the full contents of helper.h here
+
+int main(void)
+{
+    printf("Hello\n");   // printf's prototype came from that pasted-in stdio.h
+    return 0;
+}
+```
+## Macro Substitution
+```c
+#define name replacement text
+```
+Another preprocessor directive, #define, lets you give a name to a piece of text, and the preprocessor will substitute that text in, wherever the name appears, before compilation even starts. This is purely textual - no type-checking, no evaluation - just find-and-replace.
+
+```c
+#define MAX_SIZE 100
+
+int main(void)
+{
+    int arr[MAX_SIZE];   // preprocessor replaces this with: int arr[100];
+    return 0;
+}
+```
+
+**Important Concept**
+```c
+#define getchar() getc(stdin)
+```
+In many implementations of `<stdio.h>`, `getchar()` and `putchar()` aren't actually plain functions - they're defined as macros, for performance reasons (avoiding function-call overhead for something used so heavily, character by character).
+
+```c
+#undef getchar   // remove the macro definition
+
+int getchar(void)   // now this refers to the REAL underlying function
+{
+    // ...
+}
+```
+
+`#undef` is the escape hatch. It tells the preprocessor: "forget that macro definition from this point forward in the file."
+
+## Conditional Inclusion
+
+Just like your program has `if/else` for runtime decisions, the preprocessor has its own parallel set of directives for compile-time decisions: `#if`, `#ifdef`, `#ifndef`, `#else`, `#elif`, and `#endif`. These decide which chunks of source code even reach the compiler, based on conditions evaluated during preprocessing.
+
+* Example 1: `#ifdef` / `#ifndef` - "Is this name defined?"
+    ```c
+    #define DEBUG
+
+    int main(void)
+    {
+    #ifdef DEBUG
+        printf("Debug mode is on\n");   // only included if DEBUG is #defined
+    #endif
+        printf("Program running\n");
+        return 0;
+    }
+    ```
+    Here's the key: the preprocessor scans the file first, sees `#ifdef DEBUG`, checks "has `DEBUG` been `#defined` anywhere above this point?" - yes - so it keeps that `printf` line as-is. Then it hands off a modified source file to the actual compiler, which looks like this:
+    ```c
+    int main(void)
+    {
+        printf("Debug mode is on\n");
+        printf("Program running\n");
+        return 0;
+    }
+    ```
+    The `#ifdef` and `#endif` lines are gone entirely - they were never real C code, just instructions to the preprocessor.
+
+    Now, if you delete `#define DEBUG` from the top of the file, the preprocessor's check fails ("`DEBUG` is NOT defined"), so it deletes that entire `printf` line before the compiler ever sees it. The compiler receives:
+    ```c
+    int main(void)
+    {
+        printf("Program running\n");
+        return 0;
+    }
+    ```
+ * Example 2: `#ifndef` and `#define` guard
+    ```c
+    /* helper.h */
+    extern int total;
+    void add_to_total(int n);
+    ```
+    ```c
+    /* other.h */
+    #include "helper.h"   // other.h needs helper.h's declarations too
+    ```
+    ```c
+    /* main.c */
+    #include "helper.h"   // included directly...
+    #include "other.h"    // ...but other.h ALSO includes helper.h internally!
+    ```
+    Remember: `#include` is just copy-paste. So when the preprocessor flattens `main.c`, it pastes in `helper.h`'s contents once directly, and again indirectly through `other.h`. The compiler ends up seeing `extern int total;` and `void add_to_total(int n);` twice - which causes duplicate-declaration errors. 
+
+    Now let's trace the guard.
+
+    ```c
+    #ifndef HELPER_H
+    #define HELPER_H
+    extern int total;
+    void add_to_total(int n);
+    #endif
+    ```
+    First time helper.h gets pasted in (via main.c's first #include):
+
+    1. `#ifndef HELPER_H` - preprocessor asks: "has the name `HELPER_H` been `#define`d anywhere yet?" Answer: no, this is the very first time. So it proceeds into the block.
+    2. `#define HELPER_H` - this immediately marks `HELPER_H` as now defined (it doesn't need a value, it's just a flag/marker, same idea as `DEBUG` from before).
+    3. The two declaration lines get pasted in normally.
+    4. `#endif` closes the conditional.
+
+    Second time `helper.h` gets pasted in (via `other.h`'s `#include`, later in the same file):
+
+    1. `#ifndef HELPER_H` - preprocessor asks the same question again: "has `HELPER_H` been defined yet?" This time, the answer is yes - step 2 above already defined it, earlier in this same preprocessing pass.
+    2. Since the condition (`ifndef` = "if not defined") is now false, the preprocessor skips straight past everything down to `#endif` - the two declaration lines are not pasted in a second time.
+
+    End result: no matter how many places `#include "helper.h"` (directly or indirectly), the actual declarations only get pasted into the final flattened source once
+
+* Example 3 : `#if` with actual conditions (not just defined -checks)
+    ```c
+    #define VERSION 2
+
+    #if VERSION >= 2
+        printf("Using new feature\n");
+    #else
+        printf("Using legacy behavior\n");
+    #endif
+    ```
+
+
+
+    
 
 
 
