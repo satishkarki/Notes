@@ -49,3 +49,78 @@ int main()
     return 0;
 }
 ```
+## Pointers and Arrays
+```c
+int a[10];
+int *pa;
+pa=a; //equivalent to pa=&a[0];
+```
+> Core Fact: The name of an array, when used in an expression, "decays" into a pointer to its first element.
+
+So that means, these two statements are equal:
+```c
+a[i]     ==  *(a + i)
+pa[i]    ==  *(pa + i)
+```
+Now lets look at this example and see how we can use pointers instead:
+```c
+//Regular way
+int a[5] = {10, 20, 30, 40, 50};
+int sum = 0;
+int i;
+for (i = 0; i < 5; i++)
+    sum += a[i];
+```
+```c
+//Using the pointer
+int a[5] = {10, 20, 30, 40, 50};
+int sum = 0;
+int *p;
+for (p = a; p < a + 5; p++)
+    sum += *p;
+```
+One Important difference
+```c
+int a[5] = {10, 20, 30, 40, 50};
+int *pa = a;
+
+pa++;      // legal - pa is a variable, can be reassigned
+a++;       // ILLEGAL - a is not a variable, it's a fixed label for the array's address
+```
+## Address Arithmetic
+
+> Important concept : `i * sizeof(the pointed-to type)`
+
+Suppose int is 4 bytes on your system, and a starts at memory address 1000.
+```c
+int a[5] = {10, 20, 30, 40, 50};
+```
+Memory layout will look like this:
+```bash
+address:  1000   1004   1008   1012   1016
+value:    a[0]   a[1]   a[2]   a[3]   a[4]
+          10     20     30     40     50
+```
+Each `int` takes 4 bytes, so consecutive elements are 4 bytes apart, not 1 byte apart.
+
+Now, `a + 2` doesn't mean "address 1002" (that would land you inside `a[0]`, garbage). It means:
+```c
+a + 2  =  1000 + (2 * sizeof(int))  =  1000 + 8  =  1008
+```
+...which correctly lands you at `a[2]`. The compiler knows `a` is `int *`, so it automatically multiplies your offset by `sizeof(int)` before adding it to the raw address.
+
+> Legal Pointer Operations
+1. Add or subtract an integer to/from a pointer: `p + n`, `p - n`
+2. Subtract one pointer from another (only if both point into the same array): `p2 - p1`
+3. Compare two pointers with `<`, `<=`, `>`, `>=`, `==`, `!=` (only meaningful if both point into the same array)
+
+```c
+int a[10];
+int *p1 = &a[2];
+int *p2 = &a[7];
+
+int n = p2 - p1;   // n == 5
+```
+## Character Pointers and Functions
+
+
