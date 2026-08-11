@@ -123,4 +123,31 @@ int n = p2 - p1;   // n == 5
 ```
 ## Character Pointers and Functions
 
+```c
+char *pmessage;
+pmessage = "now is the time";
+```
+> Note: C has no built-in string type. A "string" is just a convention - an array of `chars` terminated by a special sentinel value, `'\0'` (the null character, value `0`).
+
+Here, `"now is the time"` is a string constant - stored somewhere in memory as a sequence of characters plus a trailing `'\0'`. The name `pmessage` doesn't hold the characters themselves; it holds the address of the first character (`'n'`). This is exactly the array-decay behavior from `pointer and array` topic above.
+
+```c
+char amessage[] = "now is the time";   // an array - stores the actual characters
+char *pmessage   = "now is the time";  // a pointer - points to the string constant
+```
+* `amessage` is an array; the characters live inside `amessage`'s own memory. You can modify individual characters: `amessage[0] = 'N';` is legal.
+* `pmessage` is a pointer; it points at a string literal, which many compilers place in read-only memory. Attempting `pmessage[0] = 'N';` is undefined behavior - it might crash, or silently corrupt something, depending on the platform.
+
+Example:
+`strlen` function
+```c
+int strlen(char *s)
+{
+    int n;
+    for (n = 0; *s != '\0'; s++)
+        n++;
+    return n;
+}
+```
+## Pointer Arrays: Pointers to Pointers
 
