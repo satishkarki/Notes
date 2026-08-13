@@ -51,4 +51,10 @@ First we have to setup our toolset.
     I will update the list for my Fedora later.
 
 4. OpenOCD 
+    * Installation [instruction](https://xpack-dev-tools.github.io/openocd-xpack/docs/install/)
+    * Package [Repo](https://github.com/xpack-dev-tools/openocd-xpack/releases)
+
+    We will revisit this topic later when we start our project.
+
+
 
