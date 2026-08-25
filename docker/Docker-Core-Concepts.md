@@ -283,7 +283,144 @@ docker push username/getting-started:v2.0
 
 Next we will look into sharing the application.
 
-### Part 3 : [Share the application](https://docs.docker.com/get-started/workshop/04_sharing_app/)
+## Part 3 : [Share the application](https://docs.docker.com/get-started/workshop/04_sharing_app/)
+
+Looks like this part covers the docker registry - Docker hub and repository. 
+
+Curiosity got the best of me. Just to recap, we already set this up in Part 1 Section D.
+
+```bash
+docker tag local-image:tagname new-repo:tagname
+docker push new-repo:tagname
+```
+Here is how my docker hub repo looks like. I am getting the gist of versioning as well.
+![docker-hub](image-resource/docker-core-concepts/docker-hub.png)
+
+## Part 4 : [Persist the DB](https://docs.docker.com/get-started/workshop/05_persisting_data/)
+
+Let's look at container's filesystem first. When a container runs, it uses the various layers from an image for its filesystem. Each container also gets its own "scratch space" to create/update/remove files. Any changes won't be seen in another container, even if they're using the same image.
+
+![Container nature](image-resource/docker-core-concepts/docker-db.png)
+
+On the above screenshot, we ran a new Alpine container and created a `greeting.txt` file, with `-rm` we removed the container when file creation is finished.
+```bash
+docker run --rm alpine touch greeting.txt
+```
+Now if we try to check the stat of the `greeting.txt` after spinning on another container using the same image we get the error- cannot find the `greeting.txt` file.
+
+```bash
+docker run --rm alpine stat greeting.txt
+```
+### Container Volume
+It provides the ability to connect specific filesystem paths of the container back to the host machine. If you mount a directory in the container, changes in that directory are also seen on the host machine. If you mount that same directory across container restarts, you'd see the same files.
+
+### Step A. Create a volume and start the container
+
+Let's look at the commands and let's try to understand what's going on.
+```bash
+docker volume create todo-db
+```
+It simply creates a [volume](https://docs.docker.com/engine/storage/volumes/). Let's check
+```bash
+docker volume ls
+```
+
+![docker volume](image-resource/docker-core-concepts/docker-volume-ls.png)
+
+```bash
+docker run -dp 127.0.0.1:3000:3000 --mount type=volume,src=todo-db,target=/etc/todos getting-started
+```
+Let's break it down.
+```bash
+docker run
+│
+├── -d
+│     run in the background
+│
+├── -p 127.0.0.1:3000:3000
+│     connect your computer's port 3000
+│     to the container's port 3000
+│
+├── --mount
+│     attach some storage
+│
+│   ├── type=volume
+│   │     use a Docker volume
+│   │
+│   ├── src=todo-db
+│   │     use the volume named "todo-db"
+│   │
+│   └── target=/etc/todos
+│         make that volume available here
+│         inside the container
+│
+└── getting-started
+      image used to create the container
+```
+I am more interested in target `/etc/todos`. Why this path? The answer is in source code. 
+
+![Sourcecode](image-resource/docker-core-concepts/source-code.png)
+Look at the highlighted line of code - up until now, container would get its own "scratch space" to create/update/remove files - which in this case is `/etc/todos/todo.db` and once container is stopped and remove, it would go away.
+
+Now with volume, here is what's happening:
+```bash
+Container                         Volume: todo-db
+┌────────────────────────┐       ┌─────────────────────┐
+│                        │       │                     │
+│ /etc/todos ─────────────────►  │ todo.db             │
+│      │                 │       │                     │
+│      └── todo.db       │       └─────────────────────┘
+│                        │
+└────────────────────────┘
+```
+### Step B. Verify the data persist
+* Add items to the todo list app http://127.0.0.1:3000/
+* Remvoe the container
+    ```bash
+    docker rm -f <id>
+    ```
+* Start a new container 
+    ```bash
+    docker run -dp 127.0.0.1:3000:3000 --mount type=volume,src=todo-db,target=/etc/todos getting-started
+    ```
+* Yes, my todo list is still there.
+
+### Step C. Dive into the volume
+Where is Docker storing my data when I use a volume?
+```bash
+docker volume inspect todo-db
+```
+***Output***
+```json
+[
+    {
+        "CreatedAt": "2026-08-25T19:43:52Z",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/todo-db/_data",
+        "Name": "todo-db",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+```
+The `Mountpoint` is the actual location of the data on the disk.
+```bash
+Container sees:                 Docker stores:
+
+/etc/todos                     /var/lib/docker/volumes/
+       │                        todo-db/_data
+       │                              ▲
+       └──────────────────────────────┘
+             mounted volume
+```
+To see mount point only:
+```bash
+docker volume inspect --format '{{ .Mountpoint }}' todo-db
+```
+## Part 5: [Use bind mounts](https://docs.docker.com/get-started/workshop/06_bind_mounts/)
+
+
 
 
 
