@@ -62,6 +62,11 @@ So that means, these two statements are equal:
 a[i]     ==  *(a + i)
 pa[i]    ==  *(pa + i)
 ```
+Example:
+* pa[2] → indexing syntax, reads as "element 2 of pa"
+
+* (pa + 2) → pointer arithmetic, reads as "go 2 ints past where pa points, then dereference"
+
 Now lets look at this example and see how we can use pointers instead:
 ```c
 //Regular way
