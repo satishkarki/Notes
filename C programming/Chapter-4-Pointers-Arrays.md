@@ -13,7 +13,7 @@ int *ip; //ip is declared as pointer to int
 ip=&x; //ip now holds the address of x
 printf("%d\n", *ip); //deference, prints 1
 ```
-> Note the dual role of `*` here — in the declaration `int *p;`, it means "p is a pointer to int." In the expression `*p`, it means "dereference p." Same symbol, different job depending on context.
+> Note the dual role of `*` here - in the declaration `int *ip;`, it means "ip is a pointer to int." In the expression `*ip`, it means "dereference ip." Same symbol, different job depending on context.
 
 Example:
 
@@ -156,3 +156,174 @@ int strlen(char *s)
 ```
 ## Pointer Arrays: Pointers to Pointers
 
+I tied to follow the example in book but it flew over my head. So I am relying on this [w3schools note](https://www.w3schools.com/c/c_pointer_to_pointer.php) to get acquainted with the pointer concept.
+
+```c
+int myNum = 5;
+int *ptr = &myNum;
+int **pptr = &ptr;
+
+**pptr = 20; // changes myNum
+
+printf("myNum = %d\n", myNum); // prints 20 
+```
+* A pointer to pointer stores the address of another pointer.
+* `*ptr` gives the value of a variable.
+* `**pptr` gives the same value by following two levels of indirection.
+
+## Multi-dimensional Arrays
+
+Again, I didn't want to spend much time on it. I rather choose to go through this [Multi-dimensional note](https://www.w3schools.com/c/c_arrays_multi.php) to get the gist of it.
+
+From K&R book: 
+* `int m[4][3]` is one contiguous block of 12 ints in memory - not separate rows, not pointers to anything. It's a flat sequence that we interpret as rows and columns.
+* Indexing formula to locate any element within in the block
+```bash
+offset = row * (columns per row) + column
+```
+***Example***
+```c
+int a[10][20];      // a true 2D array: ONE block of 200 ints, contiguous
+int *b[10];         // an array of 10 pointers: EACH pointer can point anywhere separately
+```
+
+
+## Initialization of Pointer Arrays
+```c
+char *month_name(int n)
+{
+    static char *name[] = {
+        "Illegal month",
+        "January", "February", "March",
+        "April", "May", "June",
+        "July", "August", "September",
+        "October", "November", "December"
+    };
+
+    return (n < 1 || n > 12) ? name[0] : name[n];
+}
+```
+Let's break it down:
+* The function name `char *month_name(int n)`, how to read it? - month_name is a function that takes integer n input and returns `char *` meaning - returns a pointer to character aka address of the character.
+
+* the `static char *name[]={}` , how to read it? - `name` is an array `[]` of `char *` (array of pointers to char)
+
+* `static` - This means `name` is created once and keeps its values between function calls, rather than being rebuilt from scratch every time `month_name()` runs. Without `static`, a local array like this would normally be re-initialized on every single call - wasteful for a fixed table that never changes.
+
+## Pointers to Functions
+
+Just like variables live at addresses, so does compiled code. A function has an address in memory too - and C lets you store that address in a pointer, then call the function through that pointer.
+
+```c
+int (*comp)(void *, void *);
+```
+* This says: `comp` is a pointer to a function that takes two `void *` arguments and returns an `int`
+* Here `void *` means a pointer to some type, unspecified
+
+Note:
+```c
+int *comp(void *, void *);   // DIFFERENT: a function named comp, returning int*
+```
+
+***Important Concept***
+
+Let's recall
+```c
+int a[5];
+int *pa = a;      // no & needed - 'a' already means "address of a[0]"
+```
+Similarly
+```c
+int numcmp(int a, int b) { ... }
+
+int (*p)(int, int) = numcmp;    // 'numcmp' by itself already means its own address
+
+int (*p)(int, int) = &numcmp;  // also legal, & is optional here, means the same thing
+```
+Let's look at the below example and its output to better understand the above concept.
+```c
+#include <stdio.h>
+
+int numcmp(int a, int b)
+{
+    return a - b;
+}
+
+int main(void)
+{
+    // 'numcmp' by itself (no parentheses) means "the address of this function"
+    // just like an array name 'a' by itself means "the address of a[0]"
+
+    printf("Address of numcmp: %p\n", (void *)numcmp);
+
+    int (*p)(int, int);
+    p = numcmp;   // no & needed - numcmp already IS the address
+
+    printf("Address stored in p: %p\n", (void *)p);
+
+    // both addresses printed above will be IDENTICAL
+
+    int result = p(10, 3);   // call the function through the pointer
+    printf("p(10, 3) = %d\n", result);
+
+    return 0;
+}
+```
+
+***Output***
+```bash
+Address of numcmp: 0x5578a1b3e169
+Address stored in p: 0x5578a1b3e169
+p(10, 3) = 7
+```
+### Example
+```c
+#include <stdio.h>
+
+// Two candidate functions with matching signatures
+int add(int a, int b)
+{
+    return a + b;
+}
+
+int multiply(int a, int b)
+{
+    return a * b;
+}
+
+// A function that takes a "pointer to function" as a parameter
+int compute(int x, int y, int (*op)(int, int))
+{
+    return op(x, y);   // call whichever function op points to
+}
+
+int main(void)
+{
+    int (*fp)(int, int);   // fp: pointer to a function taking (int,int), returning int
+
+    fp = add;                          // fp now points at add
+    printf("add:      %d\n", fp(3, 4));       // calls add(3,4) -> 7
+
+    fp = multiply;                     // fp now points at multiply
+    printf("multiply: %d\n", fp(3, 4));       // calls multiply(3,4) -> 12
+
+    // Passing function pointers directly into another function
+    printf("compute(add):      %d\n", compute(5, 6, add));       // 11
+    printf("compute(multiply): %d\n", compute(5, 6, multiply));  // 30
+
+    return 0;
+}
+```
+***Output***
+```bash
+add:      7
+multiply: 12
+compute(add):      11
+compute(multiply): 30
+```
+
+## Complicated Declarations
+
+As the name suggests, it is complicated and my brain couldn't grasp the idea completely for now. My brain hurts when I try to comprehend the concepts presented in this section. So, I am leaving this part empty for now. And, I will revisit this later. 
+
+Basically this part sums up the different ways the pointers are bind using the `()` and how to interpret it. More on this later.
