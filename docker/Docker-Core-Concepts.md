@@ -420,6 +420,9 @@ docker volume inspect --format '{{ .Mountpoint }}' todo-db
 ```
 ## Part 5: [Use bind mounts](https://docs.docker.com/get-started/workshop/06_bind_mounts/)
 
+Looks like Docker made some changes to their website. I cannot find the above link. Here is the replacement link they have instead. 
+[Sharing local files with containers](https://docs.docker.com/get-started/docker-concepts/running-containers/sharing-local-files/)
+
 
 
 
