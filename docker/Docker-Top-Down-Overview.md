@@ -15,7 +15,7 @@ On the other hand, Docker Desktop creates a small Linux virtual machine. That VM
 * Containers inside that Docker Engine.
 
 Lets briefly tocuh on KVM and QEMU before diving into Docker Desktop installtion. 
-QEMU as the name suggest- Quick Emulator creates virtual machine model- motherboard, firmware, disks, network cards, display, USB ect. It can even emulate the CPU. But the software emulated CPU can be slow- thats where the KVM comes in. Kernal-based Virtual Machine turns Linux kernel into a hardware assisted hypervisor.  It lets normal guest CPU instrcutions run directly on the host CPU. 
+QEMU as the name suggest- Quick Emulator creates virtual machine model - motherboard, firmware, disks, network cards, display, USB etc. It can even emulate the CPU. But the software emulated CPU can be slow- that's where the KVM comes in. Kernal-based Virtual Machine turns Linux kernel into a hardware assisted hypervisor.  It lets normal guest CPU instructions run directly on the host CPU.
 
 ![KVM QEMU](image-resource/kvm-qemu.png)
 
@@ -227,6 +227,16 @@ The command here looks similar to how we work with the git. I love it. Kudos to 
 ![docker-push](image-resource/docker-push.png)
 
 > Build and push process using the VS Code Extension is [here](https://docs.docker.com/get-started/introduction/build-and-push-first-image/) 
+
+
+### Extra
+Here is a useful docker command I stumbled upon:
+```bash
+docker system df 
+docker system df -v #Verbose
+```
+And the out gives you a pretty good idea of whats going on with your docker VM.
+![system-df](image-resource/system-df.png)
 
 
 Now that we have gone through the quick rundown of how the docker works and how it helps solve the problem of "It works on my machine" problem. Next we will look into the nitty gritty of the technical details including the docker file and compose.yml

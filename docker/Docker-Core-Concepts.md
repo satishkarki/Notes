@@ -1,6 +1,6 @@
 # Docker : Core Concepts
-
-* Docker: The tool/platform that manages everything
+* Docker daemon : `dockerd` listens for the Docker API requests and manages       Docker objects such as images, containers, networks, and volumes.
+* Docker: The Docker client (`docker`) is the primary way that many Docker users interact with Docker. When you use commands such as docker run, the client sends these commands to `dockerd`, which carries them out. The docker command uses the Docker API. 
 * Image: The packaged blueprint/template for an application
 * Container: an instance created from that image, usually where the application actually runs
 
