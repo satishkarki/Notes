@@ -185,3 +185,6 @@ Now let's look at the newly created `sample-app` image history:
 Looks familiar? Compare the changes with the base image.
 
 # Writing a Dockerfile
+
+A Dockerfile is a text-based document that's used to create a container image. It provides instructions to the image builder on the commands to run, files to copy, startup command, and more.
+
