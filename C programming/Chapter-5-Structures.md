@@ -1,6 +1,6 @@
 # Structures
 
-I am hoping the `struct` concept is easier to wrap my head around than `pointer`. Pointer gave me PTSD and I still have difficulty sleeping at night. The only good thing came out of pointer, not for me but for my wife - I'm now afraid to point my finger at my her mistakes. I now point to a pointer of her mistake. Got it? Let's dive into `struct`.
+I am hoping the `struct` concept is easier to wrap my head around than `pointer`. Pointer gave me PTSD and I still have difficulty sleeping at night. The only good thing came out of pointer, not for me but for my wife - I'm now afraid to point my finger at her mistakes. I now point to a pointer of her mistake. Got it? Let's dive into `struct`.
 
 ## The Core Idea
 A structure is a collection of one or more variables, possibly of different types, grouped together under a single name for convenient handling.
@@ -139,14 +139,14 @@ Let's look at what we have already established first.
     struct point { int x; int y; };
     struct point p = {10, 20};   // ONE point
     ```
-* An array holds many values of the same tupes side by side (From Chapter- Pointer)
+* An array holds many values of the same types side by side (From Chapter- Pointer)
     ```c
     int scores[3] = {90, 85, 95};   // THREE ints, side by side
     ```
 So `Arrays of Structures` just combines these two ideas: instead of an array holding plain ints side-by-side, it holds multiple structs side-by-side.
 ```c
 struct point points[3] = { {0,0}, {5,5}, {10,10} };
-//    ^this array holds THREE struct point values
+//              ^this array holds THREE struct point values
 ```
 
 Now lets look at K&R's example:
