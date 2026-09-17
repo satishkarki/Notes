@@ -184,7 +184,95 @@ Now let's look at the newly created `sample-app` image history:
 
 Looks familiar? Compare the changes with the base image.
 
-# Writing a Dockerfile
+## Writing a Dockerfile 
+
 
 A Dockerfile is a text-based document that's used to create a container image. It provides instructions to the image builder on the commands to run, files to copy, startup command, and more.
+
+[Instruction](https://docs.docker.com/get-started/docker-concepts/building-images/writing-a-dockerfile/)
+
+```dockerfile
+FROM node:22-alpine
+
+WORKDIR /app
+
+COPY . .
+
+RUN yarn install --production
+
+CMD ["node", "./src/index.js"]
+```
+Let's break it down: 
+
+* `node:22-alpine` : node:22-alpine already gives you a lightweight Alpine Linux environment with Node.js installed. Use this existing image as my foundation.
+* `WORKDIR /app` : Docker defines WORKDIR as the directory where subsequent commands execute and where relative paths are based.
+
+    ```bash
+    Container filesystem
+
+    /
+    ├── bin
+    ├── etc
+    ├── usr
+    ├── var
+    └── app  ← we are working here
+    ```
+* `COPY . .` : Copy files from my current project and put them in the current working directory inside the image.
+    ```bash
+    Docker image
+    /
+    └── app/
+        ├── package.json
+        ├── yarn.lock
+        └── src/
+            └── index.js
+    ```
+* `RUN yarn install --production` : means - While building the image, execute this command.
+
+* `CMD ["node", "./src/index.js"]` : When someone creates a container from this image, run the application using this command.
+
+    Conceptually: 
+    ```bash
+    node ./src/index.js
+    ```
+    So when we run `docker run my-app`, it is doing `docker run my-app node ./src/index.js`
+
+This Dockerdfile is not production ready yet. It is recommended to follow the best practices to make the image maximize the build cache, run as a non-root user, and multi-stage builds.
+
+* [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
+* [Docker best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+* [Base images](https://docs.docker.com/build/building/base-images/)
+
+## Build, tag and publish an image
+
+I already covered this in detail in Docker 101 and Docker 102 post. So I will keep it short and sweet here.
+
+```bash
+Docker build .
+```
+The final `.` in the command provides the path or URL to the build context. At this location, the builder will find the Dockerfile and other referenced files.
+
+![docker build](image-resource/docker-image-concepts/docker-build.png)
+
+As we can see in the above screenshot, if I run `dicker build .` the image created doesn't have a name.
+
+Also, while we are at it, lets look at the layers it created. It gives us a insight of our Dockerfile.
+![Layers](image-resource/docker-image-concepts/layers.png)
+
+Let's fix the name issue with tags.
+
+### Tagging
+Tagging images is the method to provide an image with a memorable name. However, there is a structure to the name of an image. A full image name has the following structure:
+
+```bash
+[HOST[:PORT_NUMBER]/]PATH[:TAG]
+```
+
+
+
+
+    
+
+
+
 
