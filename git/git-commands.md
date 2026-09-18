@@ -1,5 +1,7 @@
 # Useful git commands
 
+## stash
+
 ```bash
 git stash              # save current changes, clean working dir
 git stash list          # show all stashed entries
@@ -14,3 +16,12 @@ By default, git stash does NOT include untracked (new) files. If you want those 
 git stash -u
 ```
 
+# diff
+Sometimes I want to see the difference in files after I do `git fetch` and before `git pull`
+
+```bash
+ git diff --name-status HEAD..origin/main # To see what file is changed
+ 
+ git diff HEAD..origin/main # To see the actual difference in the file
+ ```
+ 
