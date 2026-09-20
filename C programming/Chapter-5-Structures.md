@@ -181,3 +181,67 @@ What is [binary search](https://www.geeksforgeeks.org/dsa/binary-search/)?
 ![binary search](media/structures/image.png)
 
 ## Pointers to Structures
+
+If you are able to untangle the binary search code below, piece by piece then you will hopefully get the gist of pointers to structures.
+
+This was kind of hard for me to grab the concept the first time but staring at it for a while and going through the steps one at a time made it easier to grasp.
+
+I am leaving this section with just the code snippet below for future me to pull the hair and hopefully recall what is happening here.
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+struct key {
+    char *word;
+    int count;
+};
+
+struct key *binsearch(char *word, struct key *tab, int n) {
+    int cond;
+    struct key *low = tab;
+    struct key *high = tab + n - 1;
+    struct key *mid;
+
+    while (low <= high) {
+        mid = low + (high - low) / 2;
+        cond = strcmp(word, mid->word);
+        if (cond < 0)
+            high = mid - 1;
+        else if (cond > 0)
+            low = mid + 1;
+        else
+            return mid;      // return pointer to the matching struct
+    }
+    return NULL;   // not found - NULL pointer signals failure
+}
+
+int main(void) {
+    struct key keytab[] = {
+        {"auto", 0},
+        {"break", 0},
+        {"case", 0},
+        {"char", 0},
+        {"if", 0},
+        {"while", 0}
+    };
+    int n = sizeof(keytab) / sizeof(keytab[0]);
+    char *target = "if";
+
+    struct key *result = binsearch(target, keytab, n);
+
+    if (result == NULL)
+        printf("Keyword \"%s\" not found\n", target);
+    else
+        printf("Keyword \"%s\" found, count = %d\n", result->word, result->count);
+
+    return 0;
+}
+```
+One thing I will add from the book is the way the binsearch could be declared:
+```c
+struct key *binsearch(char *word, struct key *tab, int n)   // pointer form
+struct key *binsearch(char *word, struct key tab[], int n)  // array form
+```
+## Self-referential Structures
+
