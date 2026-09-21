@@ -245,3 +245,174 @@ struct key *binsearch(char *word, struct key tab[], int n)  // array form
 ```
 ## Self-referential Structures
 
+It is a struct that has, as one of its members, a pointer to another struct of the same type.
+
+```c
+struct tnode {
+    char *word;
+    int count;
+    struct tnode *left;    // pointer to another tnode
+    struct tnode *right;   // pointer to another tnode
+};
+```
+Warning!!! The Crucial Rule: It MUST Be a Pointer, Not the Struct Itself
+```c
+struct tnode {
+    char *word;
+    int count;
+    struct tnode left;    // ILLEGAL - compile error
+    struct tnode right;   // ILLEGAL - compile error
+};
+```
+`Why this fails`: For the compiler to know how many bytes struct tnode needs, it must know the size of every member. But if left is itself a full struct tnode, that struct would need to contain another left, which needs another, forever - an infinitely large, never-completable struct. The compiler can't compute a finite size for something that's infinitely nested inside itself.
+
+`Why a pointer fixes this`: A pointer's size is always fixed (e.g., 8 bytes on most modern systems), regardless of what type it points to. So struct tnode *left; just needs 8 bytes for the pointer itself - no matter how large or deeply-nested the tree eventually grows. The compiler doesn't need to know the "final size" of the whole tree upfront, just the size of one address.
+
+### `NULL` as `No Child Exists`
+Since not every node has both a left and right child, C needs a way to represent "this pointer doesn't point to a real node." That's exactly what NULL is for:
+
+```c
+struct tnode *root = NULL;   // an empty tree - no nodes yet
+```
+Or for a leaf node (no children)
+```c
+struct tnode leaf;
+leaf.word = "hello";
+leaf.count = 1;
+leaf.left = NULL;    // no left child
+leaf.right = NULL;   // no right child
+```
+### Example: Binary Tree Word Count 
+One thing I would like to briefly touch.
+
+```c
+void *malloc(size_t size);
+```
+This is a function declaration (a prototype) - it lives in the header file `<stdlib.h>`
+
+What it's saying: "Somewhere, there exists a function named malloc. It takes one parameter, size (of type size_t, basically an unsigned integer used for sizes/counts). It returns a void * (an unlabeled pointer)."
+
+```c
+malloc(sizeof(struct tnode));
+```
+This is a function call. 
+
+What it's saying: "Call the malloc function. Pass it the value sizeof(struct tnode) as the size argument." This actually executes at runtime and returns a real pointer value (which you'd typically store somewhere, like p = malloc(...)).
+
+In our example: This says, "give me exactly enough bytes for one struct tnode." Since sizeof(struct tnode) is always a fixed, computable number (thanks to the self-referential pointer rule you just learned!), malloc knows precisely how much space to carve out - one node's worth, no more, no less.
+
+***Why `talloc` Exists as a Wrapper?***
+
+```c
+struct tnode *talloc(void) {
+    return (struct tnode *) malloc(sizeof(struct tnode));
+}
+```
+
+To understand the above code lets understand the code below first.
+```c
+struct tnode *p;
+p = malloc(sizeof(struct tnode));   // no cast
+```
+We have established that `malloc(sizeof(struct tnode));` return `void *` (an unlabeled pointer), but here we are assigning it to p and type of p is `struct tnode`. We are assigning an "unlabeled box" into a variable that expects a "box specifically labeled struct tnode."
+
+In C, this actually works without a cast (unlike C++), because C allows automatic conversion from `void *` to any other pointer type. But it's still common/good style to be explicit about it, and K&R does so for clarity.
+
+So what we do, we make the label explicit with cast
+```c
+p = (struct tnode *) malloc(sizeof(struct tnode));
+//   ^^^^^^^^^^^^^^^
+//   this is the cast
+```
+
+`(struct tnode *)` in front of an expression means: "treat whatever comes next as this type." We are taking the generic `void *` that `malloc` returns, and explicitly telling the compiler: "I know this is unlabeled, but I want you to now treat it as a `struct tnode *`."
+
+To solidify the above concept, lets look at the below code snippet that uses the cast to convert the return type to `int`
+```c
+int *p;
+p = (int *) malloc(sizeof(int));   // reserve enough bytes for ONE int, label the result as "int *"
+*p = 42;                            // now safe to use p as a pointer to an int
+printf("%d\n", *p);                 // prints 42
+```
+With this build up and foundation, lets look at the binary tree word count example.
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#define MAXWORD 100
+
+struct tnode {
+    char *word;
+    int count;
+    struct tnode *left;
+    struct tnode *right;
+};
+
+struct tnode *talloc(void) {
+    return (struct tnode *) malloc(sizeof(struct tnode));
+}
+
+struct tnode *addtree(struct tnode *p, char *w) {
+    int cond;
+
+    if (p == NULL) {
+        p = talloc();
+        p->word = strdup(w);
+        p->count = 1;
+        p->left = p->right = NULL;
+    } else if ((cond = strcmp(w, p->word)) == 0) {
+        p->count++;
+    } else if (cond < 0) {
+        p->left = addtree(p->left, w);
+    } else {
+        p->right = addtree(p->right, w);
+    }
+    return p;
+}
+
+void treeprint(struct tnode *p) {
+    if (p != NULL) {
+        treeprint(p->left);
+        printf("%4d %s\n", p->count, p->word);
+        treeprint(p->right);
+    }
+}
+
+int getword(char *word, int lim) {
+    int c;
+    char *w = word;
+
+    while (isspace(c = getchar()))
+        ;
+    if (c != EOF)
+        *w++ = c;
+    if (!isalpha(c)) {
+        *w = '\0';
+        return c;
+    }
+    for ( ; --lim > 0; w++) {
+        if (!isalnum(*w = getchar())) {
+            ungetc(*w, stdin);
+            break;
+        }
+    }
+    *w = '\0';
+    return word[0];
+}
+
+int main(void) {
+    struct tnode *root;
+    char word[MAXWORD];
+
+    root = NULL;
+    while (getword(word, MAXWORD) != EOF) {
+        if (isalpha(word[0]))
+            root = addtree(root, word);
+    }
+    treeprint(root);
+    return 0;
+}
+```
