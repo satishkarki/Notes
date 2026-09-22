@@ -416,3 +416,175 @@ int main(void) {
     return 0;
 }
 ```
+With the above example we are entering the realm of DSA, so I don't want to go through another rabbit hole for now. I will leave it to future me to revisit the code, when I am ready to dive into DSA. For now, I think I have gained sufficient knowledge about self-referential structure to proceed.
+
+## Table Lookup
+Here, again I will not go through the whole code. This is a problem for future me. What I get from the section is that instead of binary tree, where each node has two elements or NULL. Using self-referential struct, it can be used to arrange data this way as well:
+
+![Geeksforgeeks](media/structures/geeksforgeeks.png)
+Image Source: https://www.geeksforgeeks.org/dsa/linked-list-data-structure/
+
+```c
+struct tnode {
+    char *word;
+    struct tnode *next;
+};
+```
+There is a lot going on the code. The question a hash table asks: what if, instead of comparing your way to the right spot, you could somehow compute exactly where a word should live, directly from the word itself - with zero comparisons needed to find the right neighborhood?
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define HASHSIZE 101
+
+struct nlist {
+    struct nlist *next;   // next entry in same bucket's chain
+    char *name;
+    char *defn;
+};
+
+static struct nlist *hashtab[HASHSIZE];   // array of "shelves"
+
+unsigned hash(char *s) {
+    unsigned hashval;
+    for (hashval = 0; *s != '\0'; s++)
+        hashval = *s + 31 * hashval;
+    return hashval % HASHSIZE;
+}
+
+struct nlist *lookup(char *s) {
+    struct nlist *np;
+    for (np = hashtab[hash(s)]; np != NULL; np = np->next)
+        if (strcmp(s, np->name) == 0)
+            return np;
+    return NULL;
+}
+
+struct nlist *install(char *name, char *defn) {
+    struct nlist *np;
+    unsigned hashval;
+
+    if ((np = lookup(name)) == NULL) {
+        np = (struct nlist *) malloc(sizeof(*np));
+        if (np == NULL || (np->name = strdup(name)) == NULL)
+            return NULL;
+        hashval = hash(name);
+        np->next = hashtab[hashval];
+        hashtab[hashval] = np;
+    } else {
+        free((void *) np->defn);
+    }
+    if ((np->defn = strdup(defn)) == NULL)
+        return NULL;
+    return np;
+}
+
+int main(void) {
+    install("PI", "3.14159");
+    install("E", "2.71828");
+    install("MAX", "100");
+
+    struct nlist *found = lookup("PI");
+    if (found != NULL)
+        printf("PI is defined as %s\n", found->defn);
+
+    found = lookup("MISSING");
+    if (found == NULL)
+        printf("MISSING is not defined\n");
+
+    install("PI", "3.14159265");   // updates existing entry
+    found = lookup("PI");
+    printf("PI is now defined as %s\n", found->defn);
+
+    return 0;
+}
+```
+```bash
+PI is defined as 3.14159
+MISSING is not defined
+PI is now defined as 3.14159265
+```
+
+## Typedef
+
+```c
+typedef struct nlist Nlist;
+```
+Let Nlist be another name for struct nlist." After this line, you can use Nlist anywhere you'd normally write struct nlist:
+
+```c
+struct nlist *lookup(char *s);        // before
+Nlist *lookup(char *s);               // after - shorter, still clear
+```
+## Unions
+
+If we recall a struct, each member gets its own separate space in memory.
+```c
+struct example {
+    int i;
+    float f;
+    char c;
+};
+```
+Memory-wise, this is like three separate mailboxes side by side - one for i, one for f, one for c - each holding its own value simultaneously, independent of the others.
+
+ A union looks almost the same syntactically:
+ ```c
+ union example {
+    int i;
+    float f;
+    char c;
+};
+```
+But here's the critical difference: all the members share the exact same memory location. There's only one mailbox, big enough to hold the largest member - and at any given moment, only one of i, f, or c actually holds a meaningful value. Writing to one member overwrites whatever was in another.
+
+```c
+struct s_tag { int i; float f; char c; };   // sizeof ≈ sum of all members (plus padding)
+union  u_tag { int i; float f; char c; };   // sizeof = size of the LARGEST member only
+```
+
+## Bit-fields
+
+### 1. The Core Idea
+Bit-fields let you pack multiple small values into a single unit of storage, specifying exactly **how many bits** each member should occupy - useful when values only ever need a few bits (like on/off flags), avoiding the waste of giving each one a full `int` or `char`.
+
+### 2. The Old Way (Manual Bitmasking)
+Before bit-fields, flags were packed manually using bitwise operators and mask constants:
+
+```c
+#define KEYWORD  01
+#define EXTERNAL 02
+flags |= EXTERNAL;      // turn on a bit
+flags &= ~KEYWORD;      // turn off a bit
+if (flags & STATIC)     // check a bit
+```
+
+### 3. Bit-Field Syntax
+Declared inside a struct, with `: N` specifying the bit-width:
+
+```c
+struct {
+    unsigned int is_keyword : 1;
+    unsigned int is_extern  : 1;
+    unsigned int is_static  : 1;
+} flags;
+```
+
+### 4. Usage – Looks Like Ordinary Struct Access
+No manual bit-twiddling needed - the compiler handles it:
+
+```c
+flags.is_keyword = 1;
+if (flags.is_keyword)
+    printf("This is a keyword\n");
+```
+
+### 5. Space Savings (Proven)
+Three separate 1-bit fields packed together took just **4 bytes total** (one `unsigned int`'s worth), not 3 separate ints - confirmed via `sizeof(flags)`.
+
+### 6. Key Caveats
+- **Not fully portable** - exact bit packing order/alignment is implementation-defined (varies by compiler/machine).
+- **Cannot take the address** of a bit-field member (`&flags.is_keyword` is illegal) - no bit-field has a standalone byte address.
+- Declare bit-fields as `unsigned int` for the safest, most predictable behavior.
