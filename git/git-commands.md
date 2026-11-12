@@ -25,3 +25,11 @@ Sometimes I want to see the difference in files after I do `git fetch` and befor
  git diff HEAD..origin/main # To see the actual difference in the file
  ```
  
+ # In case of local commit and remote repo is ahead
+
+```bash
+git fetch origin
+git merge origin/main
+
+git push origin main
+```
