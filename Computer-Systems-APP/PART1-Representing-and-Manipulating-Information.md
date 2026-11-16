@@ -6,6 +6,8 @@
 ![Data Size](Assets/Part1/c_data_type_sizes.webp)
 
 ## ASCII vs UTF-8
+UTF- Unicode Transformation Format. 
+
 We can think of UTF-8 as an extension of ASCII. ASCII is a subset of UTF-8. It keeps the same codes for all 128 ASCII characters and adds a way to represent characters from many other languages, as well as symbols and emoji.
 
 
